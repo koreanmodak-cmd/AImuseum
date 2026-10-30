@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI WORKSPACE : Generative Studio</title>
-    <!-- p5.js 및 Firebase SDK -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
@@ -12,106 +11,109 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         :root {
-            --bg-dark: #0a0a0c;
-            --panel-bg: #121216;
-            --panel-border: #22222a;
+            --bg-dark: #08080a;
+            --panel-bg: #101014;
+            --panel-border: rgba(255, 255, 255, 0.08);
             --text-main: #f1f5f9;
             --text-muted: #64748b;
-            --accent-red: #ff4d4d;
-            --accent-yellow: #ffc107;
-            --accent-green: #00e676;
+            --agent-red: #f43f5e;
+            --agent-yellow: #eab308;
+            --agent-green: #10b981;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            margin: 0; font-family: 'Pretendard', -apple-system, sans-serif;
+            font-family: 'Pretendard', -apple-system, sans-serif;
             background-color: var(--bg-dark); color: var(--text-main);
             display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden;
         }
 
         header {
-            padding: 16px 28px; background: rgba(10, 10, 12, 0.95);
+            padding: 18px 32px; background: rgba(8, 8, 10, 0.95);
             border-bottom: 1px solid var(--panel-border);
-            display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between;
-            backdrop-filter: blur(10px);
+            display: flex; gap: 20px; align-items: center; justify-content: space-between;
+            backdrop-filter: blur(12px);
         }
-        .header-brand { display: flex; align-items: center; gap: 20px; }
-        .header-brand h1 { margin: 0; font-size: 1.15rem; letter-spacing: 2px; font-weight: 700; text-transform: uppercase; color: #fff; }
+        .header-brand { display: flex; align-items: center; gap: 24px; }
+        .header-brand h1 { font-size: 0.95rem; letter-spacing: 3px; font-weight: 600; text-transform: uppercase; color: #fff; }
         
         .nav-btn {
-            color: #94a3b8; text-decoration: none; font-size: 0.88rem; font-weight: 500;
-            padding: 8px 14px; border-radius: 6px; border: 1px solid var(--panel-border);
-            transition: all 0.2s ease; background: #16161e;
+            color: var(--text-muted); text-decoration: none; font-size: 0.82rem; font-weight: 500;
+            padding: 7px 14px; border-radius: 4px; border: 1px solid var(--panel-border);
+            transition: all 0.2s ease; letter-spacing: 0.5px;
         }
-        .nav-btn:hover { color: #fff; border-color: #475569; background: #1e1e28; }
+        .nav-btn:hover { color: #fff; border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.03); }
 
-        .input-group { display: flex; gap: 8px; width: 100%; max-width: 580px; flex-wrap: wrap; }
+        .input-group { display: flex; gap: 10px; width: 100%; max-width: 380px; }
         input {
-            padding: 10px 14px; border-radius: 6px; border: 1px solid var(--panel-border);
-            background: #14141a; color: #fff; font-size: 0.88rem; outline: none; transition: 0.2s;
+            flex: 1; padding: 9px 14px; border-radius: 4px; border: 1px solid var(--panel-border);
+            background: #121216; color: #fff; font-size: 0.85rem; outline: none; transition: 0.2s;
         }
-        input:focus { border-color: #4f46e5; }
-        .input-name { flex: 1.2; min-width: 140px; }
-        .input-pw { flex: 1; min-width: 120px; }
+        input:focus { border-color: rgba(255,255,255,0.3); }
         
         .btn-primary {
-            padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer;
-            background: #2563eb; color: white; font-weight: 600; font-size: 0.88rem;
-            transition: 0.2s; white-space: nowrap;
+            padding: 9px 18px; border: 1px solid var(--panel-border); border-radius: 4px; cursor: pointer;
+            background: #f8fafc; color: #0f172a; font-weight: 600; font-size: 0.82rem;
+            transition: 0.2s; white-space: nowrap; letter-spacing: 0.5px;
         }
-        .btn-primary:hover { background: #1d4ed8; }
+        .btn-primary:hover { background: #e2e8f0; }
 
         .main-container { display: flex; flex: 1; overflow: hidden; }
         
         .chat-panel {
-            flex: 1; min-width: 320px; max-width: 38%; background: var(--panel-bg);
-            padding: 24px; overflow-y: auto; border-right: 1px solid var(--panel-border);
-            display: flex; flex-direction: column; gap: 16px; height: calc(100vh - 71px);
+            flex: 1; min-width: 320px; max-width: 36%; background: var(--panel-bg);
+            padding: 28px; overflow-y: auto; border-right: 1px solid var(--panel-border);
+            display: flex; flex-direction: column; gap: 18px; height: calc(100vh - 65px);
         }
-        .chat-placeholder { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; margin: auto 0; text-align: center; }
+        .chat-placeholder { color: var(--text-muted); font-size: 0.85rem; line-height: 1.7; margin: auto 0; text-align: center; font-weight: 300; }
 
         .canvas-panel {
             flex: 2; min-width: 320px; display: flex; flex-direction: column;
             align-items: center; justify-content: center; position: relative;
-            background: #060608; padding: 30px;
+            background: #040405; padding: 30px;
         }
 
         .chat-message {
-            opacity: 0; transform: translateY(12px); animation: fadeIn 0.4s forwards ease-out;
+            opacity: 0; transform: translateY(10px); animation: fadeIn 0.35s forwards ease-out;
             display: flex; flex-direction: column; gap: 6px;
         }
-        .chat-header { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
-        .chat-body {
-            background: #1a1a22; padding: 13px 16px; border-radius: 8px;
-            font-size: 0.88rem; line-height: 1.55; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.03);
-        }
+        .chat-header { font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        .chat-header::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; }
         
-        .agent-red .chat-header { color: var(--accent-red); }
-        .agent-yellow .chat-header { color: var(--accent-yellow); }
-        .agent-green .chat-header { color: var(--accent-green); }
+        .agent-red .chat-header { color: var(--agent-red); }
+        .agent-red .chat-header::before { background: var(--agent-red); }
+        .agent-yellow .chat-header { color: var(--agent-yellow); }
+        .agent-yellow .chat-header::before { background: var(--agent-yellow); }
+        .agent-green .chat-header { color: var(--agent-green); }
+        .agent-green .chat-header::before { background: var(--agent-green); }
+
+        .chat-body {
+            background: rgba(255, 255, 255, 0.02); padding: 14px 16px; border-radius: 4px;
+            font-size: 0.85rem; line-height: 1.6; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.04); font-weight: 300;
+        }
 
         #p5-container {
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8); border-radius: 4px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.9); border-radius: 2px;
             border: 1px solid rgba(255,255,255,0.08); overflow: hidden;
         }
         
         .action-buttons {
-            margin-top: 24px; display: none; gap: 12px; flex-wrap: wrap; justify-content: center;
+            margin-top: 24px; display: none; gap: 12px; justify-content: center;
         }
         .btn-secondary {
-            padding: 10px 18px; border-radius: 6px; border: 1px solid var(--panel-border);
-            background: #181820; color: #e2e8f0; font-size: 0.85rem; font-weight: 600;
-            cursor: pointer; transition: 0.2s;
+            padding: 9px 18px; border-radius: 4px; border: 1px solid var(--panel-border);
+            background: #121216; color: #e2e8f0; font-size: 0.82rem; font-weight: 500;
+            cursor: pointer; transition: 0.2s; letter-spacing: 0.5px;
         }
-        .btn-secondary:hover { background: #22222e; border-color: #64748b; color: #fff; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); color: #fff; }
 
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
 
         @media (max-width: 868px) {
             body { overflow-y: auto; }
             .main-container { flex-direction: column; }
-            .chat-panel { max-width: 100%; height: 350px; border-right: none; border-bottom: 1px solid var(--panel-border); }
-            .canvas-panel { min-height: 520px; }
+            .chat-panel { max-width: 100%; height: 320px; border-right: none; border-bottom: 1px solid var(--panel-border); }
+            .canvas-panel { min-height: 480px; }
         }
     </style>
 </head>
@@ -120,30 +122,29 @@
 <header>
     <div class="header-brand">
         <h1>AI Studio</h1>
-        <a href="museum.html" class="nav-btn">🏛️ 박물관 전시관 바로가기</a>
+        <a href="museum.html" class="nav-btn">Museum Gallery</a>
     </div>
     <div class="input-group">
-        <input type="text" id="userName" class="input-name" placeholder="이름 (예: 홍길동)" autocomplete="off">
-        <input type="password" id="userPw" class="input-pw" placeholder="삭제 비밀번호" autocomplete="off">
-        <button id="startBtn" class="btn-primary">작품 창작</button>
+        <input type="text" id="userName" placeholder="Artist Name" autocomplete="off">
+        <button id="startBtn" class="btn-primary">Generate Art</button>
     </div>
 </header>
 
 <div class="main-container">
     <div class="chat-panel" id="chatBox">
-        <div class="chat-placeholder">이름과 비밀번호를 입력하면 3명의 AI 에이전트가 토론하며 독창적인 현대 아트를 조형합니다.</div>
+        <div class="chat-placeholder">Enter an artist name to initiate the synthesis dialogue between Agent Red, Yellow, and Green.</div>
     </div>
     <div class="canvas-panel">
         <div id="p5-container"></div>
         <div class="action-buttons" id="actionBtns">
-            <button class="btn-secondary" onclick="downloadCanvas()">🖼️ 고화질 저장</button>
-            <button class="btn-secondary" onclick="saveToMuseum()" style="border-color: #059669; color: #10b981;">🏛️ 박물관에 전시하기</button>
+            <button class="btn-secondary" onclick="downloadCanvas()">Export Canvas</button>
+            <button class="btn-secondary" onclick="saveToMuseum()">Publish to Museum</button>
         </div>
     </div>
 </div>
 
 <script>
-    /* 1. Firebase 초기화 */
+    /* Firebase Config */
     const firebaseConfig = {
         apiKey: "AIzaSyBV08YxtJZ0y6NgXOlRG26mna-jEfsS5tk",
         authDomain: "aimuseum-8c30b.firebaseapp.com",
@@ -152,189 +153,140 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    /* 2. 전역 상태 */
     let currentSeed = 0;
     let userNameVal = "";
-    let userPwVal = "";
     let artGenre = 0;
     let p5Instance = null;
 
-    /* 3. 공통 생성형 아트 엔진 함수 (100% 동일 무작위 연산) */
-    function drawGenerativeArt(p, seed, genre, author) {
-        p.randomSeed(seed);
-        p.noiseSeed(seed);
-        p.background(8, 8, 10);
+    /* 고품격 통합 생성형 아트 엔진 (Texture & Grain 지원) */
+    const ArtEngine = {
+        render: function(p, seed, genre, author) {
+            p.randomSeed(seed);
+            p.noiseSeed(seed);
+            p.pixelDensity(2);
+            p.background(6, 6, 8);
 
-        // 8가지 프리미엄 현대미술 컬러 팔레트
-        const palettes = [
-            // 0: Cyberpunk Neon
-            [p.color(255, 0, 110), p.color(0, 245, 212), p.color(123, 44, 191), p.color(255, 255, 255)],
-            // 1: Swiss Bauhaus
-            [p.color(220, 38, 38), p.color(234, 179, 8), p.color(30, 58, 138), p.color(248, 250, 252)],
-            // 2: Minimalist Monochrome
-            [p.color(255, 255, 255), p.color(160, 160, 170), p.color(80, 80, 90), p.color(220, 38, 38)],
-            // 3: Terracotta Organic
-            [p.color(194, 89, 58), p.color(224, 159, 112), p.color(107, 142, 123), p.color(244, 235, 222)],
-            // 4: Deep Space Aurora
-            [p.color(16, 185, 129), p.color(139, 92, 246), p.color(59, 130, 246), p.color(251, 191, 36)],
-            // 5: High-Contrast Techno
-            [p.color(0, 255, 102), p.color(255, 255, 255), p.color(40, 40, 50), p.color(255, 0, 80)],
-            // 6: Solar Gold
-            [p.color(245, 158, 11), p.color(217, 119, 6), p.color(180, 83, 9), p.color(254, 243, 199)],
-            // 7: Pastel Brutalism
-            [p.color(244, 114, 182), p.color(165, 180, 252), p.color(147, 197, 253), p.color(30, 41, 59)]
-        ];
+            const palettes = [
+                [p.color(240, 240, 245), p.color(180, 180, 190), p.color(90, 90, 100), p.color(225, 29, 72)],
+                [p.color(225, 29, 72), p.color(234, 179, 8), p.color(30, 58, 138), p.color(248, 250, 252)],
+                [p.color(20, 184, 166), p.color(99, 102, 241), p.color(244, 63, 94), p.color(255, 255, 255)],
+                [p.color(217, 119, 6), p.color(180, 83, 9), p.color(120, 53, 15), p.color(254, 243, 199)],
+                [p.color(244, 114, 182), p.color(129, 140, 248), p.color(52, 211, 153), p.color(30, 41, 59)]
+            ];
 
-        let paletteIdx = p.floor(p.random(0, palettes.length));
-        let colors = palettes[paletteIdx];
+            let palette = palettes[p.floor(p.random(0, palettes.length))];
 
-        // 6가지 정교한 아트 장르
-        if (genre === 0) {
-            // [장르 0: 스위스 바우하우스 격자 조형]
+            // 1. 깊이감을 위한 그래디언트 필드
+            p.noFill();
+            for (let r = p.width * 1.2; r > 0; r -= 15) {
+                let c = p.random(palette);
+                p.stroke(p.red(c), p.green(c), p.blue(c), 8);
+                p.strokeWeight(12);
+                p.circle(p.width / 2, p.height / 2, r);
+            }
+
+            // 2. 장르별 핵심 아키텍처
+            if (genre === 0) {
+                // Bauhaus Minimalist Structure
+                p.noStroke();
+                for (let i = 0; i < 18; i++) {
+                    let c = p.random(palette);
+                    p.fill(p.red(c), p.green(c), p.blue(c), p.random(140, 220));
+                    let w = p.random(p.width * 0.1, p.width * 0.45);
+                    let h = p.random(p.height * 0.1, p.height * 0.45);
+                    let x = p.random(p.width * 0.1, p.width * 0.8 - w);
+                    let y = p.random(p.height * 0.1, p.height * 0.8 - h);
+                    p.rect(x, y, w, h, p.random(0, 8));
+                }
+            } else if (genre === 1) {
+                // Organic Fluid Field
+                p.noFill();
+                p.strokeWeight(p.random(0.8, 1.8));
+                for (let i = 0; i < 450; i++) {
+                    let c = p.random(palette);
+                    p.stroke(p.red(c), p.green(c), p.blue(c), p.random(100, 200));
+                    p.beginShape();
+                    let x = p.random(p.width), y = p.random(p.height);
+                    for (let j = 0; j < 22; j++) {
+                        p.vertex(x, y);
+                        let angle = p.noise(x * 0.004, y * 0.004) * p.TWO_PI * 4;
+                        x += p.cos(angle) * 7; y += p.sin(angle) * 7;
+                    }
+                    p.endShape();
+                }
+            } else if (genre === 2) {
+                // Constructivist Glitch Matrix
+                p.strokeWeight(1);
+                for (let i = 0; i < 220; i++) {
+                    let c = p.random(palette);
+                    p.stroke(p.red(c), p.green(c), p.blue(c), p.random(120, 240));
+                    let x = p.random(p.width), y = p.random(p.height);
+                    p.line(x, y, x + p.random(-150, 150), y);
+                }
+            } else {
+                // Ambient Aurora Sphere
+                p.noStroke();
+                for (let i = 0; i < 16; i++) {
+                    let c = p.random(palette);
+                    p.fill(p.red(c), p.green(c), p.blue(c), p.random(30, 90));
+                    p.circle(p.random(p.width), p.random(p.height), p.random(120, 380));
+                }
+            }
+
+            // 3. 미세 필름 그레인 & 질감 오버레이 (Canvas Texture Engine)
+            p.loadPixels();
+            for (let i = 0; i < p.pixels.length; i += 4) {
+                let grain = (p.random(-1, 1) * 16);
+                p.pixels[i] = p.constrain(p.pixels[i] + grain, 0, 255);
+                p.pixels[i+1] = p.constrain(p.pixels[i+1] + grain, 0, 255);
+                p.pixels[i+2] = p.constrain(p.pixels[i+2] + grain, 0, 255);
+            }
+            p.updatePixels();
+
+            // 4. 우측 하단 아티스트 시그니처 배지
+            p.push();
+            let tag = `${(author || 'ANONYMOUS').toUpperCase()} // ED. #${seed.toString(16).toUpperCase().slice(-5)}`;
+            p.textAlign(p.RIGHT, p.BOTTOM);
+            p.textFont('monospace');
+            p.textSize(p.max(8.5, p.width * 0.022));
+            
             p.noStroke();
-            let count = p.floor(p.random(15, 30));
-            for (let i = 0; i < count; i++) {
-                p.fill(p.random(colors));
-                let shapeType = p.floor(p.random(4));
-                let x = p.random(p.width * 0.05, p.width * 0.8);
-                let y = p.random(p.height * 0.05, p.height * 0.8);
-                let w = p.random(30, p.width * 0.4);
-                let h = p.random(30, p.height * 0.4);
-                if (shapeType === 0) p.rect(x, y, w, h, p.random(0, 15));
-                else if (shapeType === 1) p.circle(x, y, w);
-                else if (shapeType === 2) p.triangle(x, y, x + w, y, x + w/2, y + h);
-                else p.arc(x, y, w, w, 0, p.HALF_PI * p.floor(p.random(1, 5)));
-            }
-            p.stroke(255, 255, 255, 80); p.strokeWeight(0.8);
-            p.line(p.width * 0.1, p.height * 0.5, p.width * 0.9, p.height * 0.5);
-        } 
-        else if (genre === 1) {
-            // [장르 1: 벡터 유체 파동 (Flow Field)]
-            p.noFill(); p.strokeWeight(p.random(0.8, 2.2));
-            let lines = p.floor(p.random(300, 600));
-            for (let i = 0; i < lines; i++) {
-                p.stroke(p.random(colors));
-                p.beginShape();
-                let x = p.random(p.width), y = p.random(p.height);
-                for (let j = 0; j < 18; j++) {
-                    p.vertex(x, y);
-                    let angle = p.noise(x * 0.005, y * 0.005) * p.TWO_PI * 5;
-                    x += p.cos(angle) * 8; y += p.sin(angle) * 8;
-                }
-                p.endShape();
-            }
-        } 
-        else if (genre === 2) {
-            // [장르 2: 사이버 글리치 슬라이스]
-            for (let i = 0; i < 180; i++) {
-                p.stroke(p.random(colors));
-                p.strokeWeight(p.random(1, 4));
-                let x = p.random(p.width), y = p.random(p.height);
-                let len = p.random(20, 180);
-                p.line(x, y, x + len, y);
-                if (p.random(1) > 0.7) {
-                    p.noStroke(); p.fill(p.random(colors));
-                    p.rect(x, y, p.random(10, 40), p.random(2, 10));
-                }
-            }
-        } 
-        else if (genre === 3) {
-            // [장르 3: 볼륨 오로라 에테르]
-            p.noStroke();
-            for (let i = 0; i < 18; i++) {
-                let c = p.random(colors);
-                p.fill(p.red(c), p.green(c), p.blue(c), p.random(40, 110));
-                p.circle(p.random(p.width), p.random(p.height), p.random(120, 360));
-            }
-        } 
-        else if (genre === 4) {
-            // [장르 4: 방사형 신성 기하학 파동]
-            p.noFill(); p.strokeWeight(1);
-            p.translate(p.width / 2, p.height / 2);
-            let rings = p.floor(p.random(8, 20));
-            for (let i = 0; i < rings; i++) {
-                p.stroke(p.random(colors));
-                let r = i * (p.width / (rings * 2.2));
-                p.circle(0, 0, r * 2);
-                let numPoints = p.floor(p.random(4, 12)) * 2;
-                for (let a = 0; a < p.TWO_PI; a += p.TWO_PI / numPoints) {
-                    p.line(p.cos(a) * r, p.sin(a) * r, p.cos(a) * (r + 20), p.sin(a) * (r + 20));
-                }
-            }
-            p.resetMatrix();
-        } 
-        else {
-            // [장르 5: 위상 등고선 라인아트]
-            p.noFill(); p.strokeWeight(1.2);
-            let density = p.floor(p.random(20, 40));
-            for (let y = 0; y < p.height; y += p.height / density) {
-                p.stroke(p.random(colors));
-                p.beginShape();
-                for (let x = 0; x <= p.width; x += 15) {
-                    let n = p.noise(x * 0.008, y * 0.008) * 80;
-                    p.vertex(x, y + n);
-                }
-                p.endShape();
-            }
+            p.fill(6, 6, 8, 220);
+            let tw = p.textWidth(tag);
+            p.rect(p.width - tw - 24, p.height - 34, tw + 12, 22, 2);
+            
+            p.fill(241, 245, 249, 210);
+            p.text(tag, p.width - 18, p.height - 18);
+            p.pop();
         }
+    };
 
-        // ★ 우측 하단 아티스트 라벨 각인 ★
-        p.push();
-        let tagText = `${(author || 'ANONYMOUS').toUpperCase()} | ED. #${seed.toString(16).toUpperCase().slice(-5)}`;
-        p.textAlign(p.RIGHT, p.BOTTOM);
-        p.textFont('monospace');
-        p.textSize(p.max(9, p.width * 0.022));
-        
-        p.noStroke();
-        p.fill(8, 8, 10, 200);
-        let boxWidth = p.textWidth(tagText) + 20;
-        p.rect(p.width - boxWidth - 15, p.height - 38, boxWidth + 10, 26, 4);
-        
-        p.fill(226, 232, 240, 220);
-        p.text(tagText, p.width - 20, p.height - 20);
-        p.pop();
-    }
-
-    /* 4. 수십억 조합 대화 가공 모듈 */
+    /* 대화 시스템 프래그먼트 */
     const vocabulary = {
         red_1: [
-            ["이름 '{N}'에서 유니크한 에너지를 발견했어.", "입력된 '{N}'의 수치 파동을 시각화 스캔 중이야.", "'{N}'이라는 이름은 매우 강렬한 미학적 모티브를 갖고 있네."],
-            ["기초 베이스는 서사적인 미드나잇 톤으로 색면의 깊이를 잡을게.", "어두운 매트 블랙 공간 위에 색채 대비를 구축해보겠어.", "단색 고유의 중량감을 살리기 위해 딥 컬러 톤을 선택할게."]
+            ["Analyzing structural resonance of '{N}'.", "Scanning semantic profile for '{N}'."],
+            ["Setting foundational color space to deep matte tones.", "Establishing dark crimson contrast base."]
         ],
         yellow_1: [
-            ["레드의 색채 구상을 확인했어. 난 공간 조형을 시작할게.", "좋아, 그 기조에 맞춰 기하학적 그리드 텐션을 구축하겠어.", "색채를 단단하게 받쳐줄 프레임 구조를 연산 중이야."],
-            ["황금비율 그리드 분할로 구조적 균형을 형성하는 중이야.", "유체 역학 펄린 노이즈 벡터를 교차 적용해보겠어.", "글리치 노이즈 라인을 대각선으로 배치해 긴장감을 형성할게."]
+            ["Received Red's color space. Initiating spatial partition.", "Acknowledged. Constructing geometric tension."],
+            ["Applying golden ratio grid system.", "Injecting vector flow field calculations."]
         ],
         green_1: [
-            ["두 에이전트의 조형이 훌륭해. 난 빛과 입자 질감을 얹을게.", "완벽한 구도야. 난 공기감과 투명도 필터를 조정하겠어.", "균형이 잡혔네. 마지막 반짝이는 에테르 텍스처를 렌더링할 차례야."],
-            ["미세하게 빛나는 스펙트럼 필터를 합성하고 있어.", "유체 입자들을 공간 전체에 부유시키는 연산을 수행 중이야.", "아우라 텍스처를 얹어서 갤러리 아카이브 작품으로 마무리했어."]
-        ],
-        red_2: [
-            ["옐로의 공간 텐션 덕분에 색채의 대비가 극대화되었어.", "그린의 유체 레이어가 얹어지니 캔버스 전체가 생동하네.", "이 정도 깊이감이라면 독보적인 예술적 아우라가 완성되었어."]
-        ],
-        yellow_2: [
-            ["시각적 초점이 명확해졌어. 기하학적 밸런스는 완벽해.", "비대칭 요소들이 오묘한 미학적 균형을 이루고 있네.", "구도와 프레임 연산을 여기서 최종 확정짓도록 하자."]
-        ],
-        green_2: [
-            ["작품 조형 완료. 우측 하단에 '{N}' 아티스트 라벨을 깔끔하게 각인했어.", "최종 렌더링 끝. 우측 하단 에디션 시그니처 배치를 완료했어.", "창작이 끝났어. 캔버스 우측 하단 라벨을 직접 확인해봐."]
+            ["Integrating luminous texture layers.", "Adjusting airiness and spectral opacity."],
+            ["Applying film grain pass and texture synthesis.", "Artwork synthesis complete. Registered signature label."]
         ]
     };
 
-    function pseudoRandomSelect(arr, seed) {
+    function pseudoSelect(arr, seed) {
         let idx = Math.floor((Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000)) * arr.length);
         return arr[idx];
     }
 
-    /* 5. 버튼 클릭 이벤트 및 진행 */
+    /* 이벤트 바인딩 */
     document.getElementById('startBtn').addEventListener('click', () => {
         const nameInput = document.getElementById('userName').value.trim();
-        const pwInput = document.getElementById('userPw').value.trim();
-        
-        if (!nameInput) return alert("이름을 입력해주세요.");
-        if (!pwInput || pwInput.length < 4) return alert("삭제 비밀번호를 4자리 이상 입력해주세요.");
-
+        if (!nameInput) return alert("Please enter an artist name.");
         userNameVal = nameInput;
-        userPwVal = pwInput;
 
         const chatBox = document.getElementById('chatBox');
         chatBox.innerHTML = '';
@@ -343,15 +295,12 @@
         let hash = 0;
         for (let i = 0; i < userNameVal.length; i++) hash = userNameVal.charCodeAt(i) + ((hash << 5) - hash);
         currentSeed = Math.abs(hash) + Date.now();
-        artGenre = Math.floor((currentSeed % 100) / 16.6) % 6; // 0~5 장르 결정
+        artGenre = Math.floor((currentSeed % 100) / 25) % 4;
 
         const script = [
-            { agent: 'agent-red', name: '🔴 RED', text: `${pseudoRandomSelect(vocabulary.red_1[0], currentSeed).replace('{N}', userNameVal)} ${pseudoRandomSelect(vocabulary.red_1[1], currentSeed + 1)}` },
-            { agent: 'agent-yellow', name: '🟡 YELLOW', text: `${pseudoRandomSelect(vocabulary.yellow_1[0], currentSeed + 2)} ${pseudoRandomSelect(vocabulary.yellow_1[1], currentSeed + 3)}` },
-            { agent: 'agent-green', name: '🟢 GREEN', text: `${pseudoRandomSelect(vocabulary.green_1[0], currentSeed + 4)} ${pseudoRandomSelect(vocabulary.green_1[1], currentSeed + 5)}` },
-            { agent: 'agent-red', name: '🔴 RED', text: `${pseudoRandomSelect(vocabulary.red_2[0], currentSeed + 6)}` },
-            { agent: 'agent-yellow', name: '🟡 YELLOW', text: `${pseudoRandomSelect(vocabulary.yellow_2[0], currentSeed + 7)}` },
-            { agent: 'agent-green', name: '🟢 GREEN', text: `${pseudoRandomSelect(vocabulary.green_2[0], currentSeed + 8).replace('{N}', userNameVal)}` }
+            { agent: 'agent-red', name: 'AGENT RED', text: `${pseudoSelect(vocabulary.red_1[0], currentSeed).replace('{N}', userNameVal)} ${pseudoSelect(vocabulary.red_1[1], currentSeed + 1)}` },
+            { agent: 'agent-yellow', name: 'AGENT YELLOW', text: `${pseudoSelect(vocabulary.yellow_1[0], currentSeed + 2)} ${pseudoSelect(vocabulary.yellow_1[1], currentSeed + 3)}` },
+            { agent: 'agent-green', name: 'AGENT GREEN', text: `${pseudoSelect(vocabulary.green_1[0], currentSeed + 4)} ${pseudoSelect(vocabulary.green_1[1], currentSeed + 5).replace('{N}', userNameVal)}` }
         ];
 
         let step = 0;
@@ -361,9 +310,9 @@
                 step++;
             } else {
                 clearInterval(interval);
-                renderCanvasInStudio();
+                renderStudioCanvas();
             }
-        }, 1000);
+        }, 900);
     });
 
     function appendChat(className, aiName, text) {
@@ -375,16 +324,15 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    /* 6. p5.js 스튜디오 렌더링 */
-    function renderCanvasInStudio() {
+    function renderStudioCanvas() {
         if (p5Instance) p5Instance.remove();
 
         const sketch = (p) => {
             p.setup = () => {
-                let size = p.min(p.windowWidth * 0.52, 540);
-                if (p.windowWidth <= 868) size = p.min(p.windowWidth - 60, 440);
+                let size = p.min(p.windowWidth * 0.5, 520);
+                if (p.windowWidth <= 868) size = p.min(p.windowWidth - 60, 420);
                 p.createCanvas(size, size);
-                drawGenerativeArt(p, currentSeed, artGenre, userNameVal);
+                ArtEngine.render(p, currentSeed, artGenre, userNameVal);
                 p.noLoop();
             };
         };
@@ -399,19 +347,26 @@
         if (p5Instance) p5Instance.saveCanvas('art_' + userNameVal, 'jpg');
     }
 
+    /* 전시 시점에만 비밀번호 입력 요청 */
     async function saveToMuseum() {
+        const password = prompt("작품 삭제에 사용할 비밀번호(4자리 이상)를 입력하세요:");
+        if (password === null) return;
+        if (!password || password.trim().length < 4) {
+            return alert("비밀번호는 4자리 이상이어야 합니다.");
+        }
+
         try {
             await db.collection("museum_arts").add({
                 author: userNameVal,
-                password: userPwVal,
+                password: password.trim(),
                 seed: currentSeed,
                 genre: artGenre,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            alert("🏛️ 박물관에 성공적으로 전시되었습니다!");
+            alert("The artwork has been successfully published to the museum archive.");
         } catch (e) {
             console.error(e);
-            alert("전시 중 오류 발생: " + e.message);
+            alert("Error publishing artwork: " + e.message);
         }
     }
 </script>
