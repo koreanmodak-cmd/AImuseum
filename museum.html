@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0c10">
+  <meta name="description" content="FORM Museum — a public archive of original procedural artworks.">
+  <title>FORM — Museum Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;--bg:#0b0c10;--panel:#14161c;--line:#30333c;--text:#f1eee7;--muted:#969ba5;--gold:#c9b58d;--red:#d98a82}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:Pretendard,system-ui,sans-serif}button,a{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+    .topbar{min-height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:14px clamp(18px,4vw,64px);gap:18px}.brand{font:500 15px 'DM Mono',monospace;letter-spacing:.2em;color:var(--text);text-decoration:none}.brand span{color:var(--gold)}.navlink,.tab{border:1px solid var(--line);background:transparent;color:var(--muted);text-decoration:none;padding:9px 13px;border-radius:3px;font-size:12px}.navlink:hover,.tab:hover{color:var(--text);border-color:#85817a}.header-controls{display:flex;align-items:center;gap:9px;flex-wrap:wrap}.tab.active{color:#171717;background:var(--gold);border-color:var(--gold)}
+    .hero{max-width:1480px;margin:auto;padding:54px clamp(18px,5vw,76px) 30px}.eyebrow,.count,.detail-label{font:10px 'DM Mono',monospace;letter-spacing:.16em;color:var(--gold)}h1{font-size:clamp(36px,5.2vw,66px);font-weight:400;letter-spacing:-.055em;margin:16px 0 12px}.intro{font-size:14px;line-height:1.9;color:#a9adb5;max-width:720px}.toolbar{max-width:1480px;margin:0 auto 20px;padding:0 clamp(18px,5vw,76px);display:flex;justify-content:space-between;gap:12px}.gallery{max-width:1480px;margin:auto;padding:0 clamp(18px,5vw,76px) 45px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:20px}.art-card{background:var(--panel);border:1px solid var(--line);border-radius:4px;overflow:hidden;min-width:0;transition:transform .2s,border-color .2s}.art-card:hover{transform:translateY(-3px);border-color:#64636a}.art-thumb{display:block;width:100%;aspect-ratio:1;border:0;padding:0;background:#151820;overflow:hidden}.art-thumb canvas{display:block;width:100%!important;height:100%!important;object-fit:cover}.card-info{padding:14px 15px 15px}.card-topline{display:flex;justify-content:space-between;align-items:center;gap:8px}.author{font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.edition{font:9px 'DM Mono',monospace;color:var(--gold);white-space:nowrap}.subline{font:10px 'DM Mono',monospace;color:var(--muted);margin:8px 0 13px;overflow-wrap:anywhere}.card-actions{display:flex;gap:7px}.action-btn{border:1px solid #42454e;background:#1c1f27;color:#d7d4cd;border-radius:2px;padding:7px 9px;font-size:10px}.action-btn:hover{border-color:var(--gold)}.action-btn.selected{color:var(--gold);border-color:#82765d}.action-btn.danger{color:var(--red);border-color:#64413f}.action-btn:disabled{opacity:.48;cursor:wait}.action-btn[hidden]{display:none!important}.state-message{grid-column:1/-1;text-align:center;padding:65px 18px;color:var(--muted);font-size:13px;line-height:1.8}.state-message.error{color:#e2a19a}.more-wrap{text-align:center;padding:0 18px 60px}.footer{max-width:1480px;margin:auto;padding:0 clamp(18px,5vw,76px) 32px;color:#737b85;font-size:11px;line-height:1.8}.modal{position:fixed;inset:0;z-index:30;background:rgba(4,5,7,.94);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:22px}.modal.open{display:flex}.modal-box{width:min(1100px,100%);max-height:92vh;overflow:auto;background:#13151b;border:1px solid #393c45;border-radius:4px;padding:24px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:26px;position:relative}.modal-art{width:100%;aspect-ratio:1;background:#0e1116;align-self:center}.modal-art canvas{display:block;width:100%!important;height:100%!important}.details{padding:36px 10px 10px;display:flex;flex-direction:column;gap:13px}.details h2{font-size:24px;font-weight:400;margin:0;overflow-wrap:anywhere}.modal-meta{font:10px 'DM Mono',monospace;color:var(--gold);line-height:1.7}.detail-label{margin-top:10px}.detail-copy{font-size:13px;color:#b8bbc1;line-height:1.85;margin:0}.recreate{align-self:flex-start;margin-top:10px}.modal-close{position:absolute;right:16px;top:16px;border:1px solid var(--line);background:#1b1e25;color:var(--text);padding:8px 11px;border-radius:2px;font-size:11px}.loading-spinner{display:inline-block;width:13px;height:13px;border:1px solid #777;border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px;margin-right:8px}@keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:760px){.modal-box{grid-template-columns:1fr;gap:14px;padding:16px}.details{padding:4px 4px 10px}.modal-art{max-width:620px;margin:auto}.modal-close{position:sticky;top:0;justify-self:end;grid-row:1}.hero{padding-top:40px}}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">FORM<span> / </span>MUSEUM</a>
+    <div class="header-controls">
+      <button class="tab active" id="latestBtn" type="button">최신 작품</button>
+      <button class="tab" id="popularBtn" type="button">많이 큐레이션된 작품</button>
+      <a class="navlink" href="index.html">스튜디오로 ↗</a>
+    </div>
+  </header>
+  <section class="hero"><div class="eyebrow">PUBLIC COLLECTION / DIGITAL ARCHIVE</div><h1>작품이 머무는 곳.</h1><p class="intro">FORM 스튜디오에서 생성하고 게시한 작품을 모아둔 공개 아카이브입니다. 작품을 선택하면 생성 규칙과 시드를 확인하고 동일한 작품을 다시 만들 수 있습니다.</p></section>
+  <div class="toolbar"><span class="count" id="countLabel">COLLECTION / LOADING</span><span class="count" id="sortLabel">SORT / RECENT</span></div>
+  <main class="gallery" id="gallery"><div class="state-message loading"><span class="loading-spinner"></span>아카이브를 불러오는 중입니다…</div></main>
+  <div class="more-wrap"><button class="tab" id="moreBtn" type="button" hidden>더 불러오기</button></div>
+  <footer class="footer">큐레이션은 익명 Firebase 계정당 작품별 1회만 기록됩니다. 작품 삭제는 게시한 계정에 연결된 브라우저에서만 가능합니다. 익명 계정은 브라우저 데이터 삭제 시 복구가 어려울 수 있습니다.</footer>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-box">
+      <button class="modal-close" id="closeModal" type="button" aria-label="닫기">닫기 ✕</button>
+      <div class="modal-art" id="modalArt"></div>
+      <div class="details">
+        <h2 id="modalTitle"></h2>
+        <div class="modal-meta" id="modalMeta"></div>
+        <div class="detail-label">ABOUT THIS COMPOSITION</div>
+        <p class="detail-copy" id="modalNote"></p>
+        <div class="detail-label">REPRODUCE</div>
+        <p class="detail-copy">같은 작가명, 조형 언어, 시드를 스튜디오에 입력하면 동일한 작품을 재현할 수 있습니다.</p>
+        <a class="navlink recreate" id="recreateLink" href="index.html">이 작품 재현하기 ↗</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script src="art-engine.js"></script>
+  <script src="museum.js"></script>
+</body>
+</html>

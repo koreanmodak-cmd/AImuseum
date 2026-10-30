@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b0c10">
+  <meta name="description" content="FORM — a browser-based procedural fine art studio. Create, reproduce and exhibit original algorithmic compositions.">
+  <title>FORM — Generative Art Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;--bg:#0b0c10;--panel:#14161c;--panel-2:#101217;--line:#30333c;--text:#f1eee7;--muted:#969ba5;--gold:#c9b58d;--green:#8bb6a2;--danger:#d98a82}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:Pretendard,system-ui,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+    .topbar{min-height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:14px clamp(18px,4vw,64px);gap:18px}.brand{font:500 15px 'DM Mono',monospace;letter-spacing:.2em;color:var(--text);text-decoration:none}.brand span{color:var(--gold)}.topnav{display:flex;align-items:center;gap:9px}.navlink,.lang button{border:1px solid var(--line);background:transparent;color:var(--muted);text-decoration:none;padding:9px 13px;border-radius:3px;font-size:12px}.navlink:hover,.lang button.active{color:var(--text);border-color:#85817a}.lang{display:flex;gap:4px}.lang button{padding:8px 10px}
+    .hero{max-width:1480px;margin:auto;padding:58px clamp(18px,5vw,76px) 38px}.eyebrow,.section-label,.stage-title,.meta small,.field label{font:10px 'DM Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}h1{white-space:pre-line;font-size:clamp(36px,5.4vw,68px);font-weight:400;line-height:1.08;letter-spacing:-.055em;margin:17px 0 15px}.intro{max-width:760px;color:#a9adb5;font-size:14px;line-height:1.9;margin:0}
+    .workspace{max-width:1480px;margin:auto;padding:0 clamp(18px,5vw,76px) 70px;display:grid;grid-template-columns:minmax(290px,390px) minmax(0,1fr);gap:22px}.controls,.art-stage{background:var(--panel);border:1px solid var(--line);border-radius:5px}.controls{padding:25px;display:flex;flex-direction:column;gap:21px}.field{display:flex;flex-direction:column;gap:8px}.field input,.field select{width:100%;background:#0e1015;border:1px solid var(--line);border-radius:3px;color:var(--text);padding:13px 12px;outline:none}.field input:focus,.field select:focus{border-color:var(--gold)}.hint{font-size:11px;color:#858b95;line-height:1.7;margin:0}.button-row{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#1d2028;color:var(--text);padding:11px 14px;border-radius:3px;font-size:12px;transition:background .2s,border-color .2s}.btn:hover{border-color:#8a857b;background:#252832}.btn.primary{background:var(--gold);color:#171717;border-color:var(--gold);font-weight:700}.btn:disabled{opacity:.42;cursor:not-allowed}.divider{height:1px;background:var(--line)}.note-list{display:flex;flex-direction:column;gap:9px}.note-heading{font:10px 'DM Mono',monospace;letter-spacing:.12em;color:var(--gold);margin-top:3px}.note-subhead{margin-top:9px}.note-copy{font-size:12px;line-height:1.8;color:#c0c0bc;margin:0}.note-disclaimer{font-size:10px;line-height:1.7;color:#777e88;margin:4px 0 0}
+    .audio-panel{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px}.audio-actions{display:flex;align-items:center;gap:10px}.volume{width:92px;accent-color:var(--gold)}
+    .art-stage{padding:clamp(14px,2.5vw,30px);display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}.stage-head{width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}.status{font-size:11px;color:var(--green);font-family:'DM Mono',monospace}#canvasHost{width:min(100%,780px);aspect-ratio:1;background:#11141a;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid #44464d;box-shadow:0 25px 80px #0009}#canvasHost canvas{display:block;width:100%!important;height:100%!important;object-fit:contain}.placeholder{padding:35px;text-align:center;color:#858c97;font-size:13px;line-height:1.9}.metadata{width:min(100%,780px);display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}.meta{border-top:1px solid var(--line);padding-top:11px;min-width:0}.meta small{display:block;color:var(--muted);font-size:9px;margin-bottom:6px}.meta span{font-size:12px;overflow-wrap:anywhere}.stage-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:22px}.footnote{max-width:1480px;margin:0 auto;padding:0 clamp(18px,5vw,76px) 32px;color:#767d87;font-size:11px;line-height:1.8}.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,18px);opacity:0;pointer-events:none;background:#e9dfca;color:#171717;padding:12px 18px;border-radius:3px;font-size:12px;z-index:50;box-shadow:0 8px 30px #0008;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px)}.toast.show{opacity:1;transform:translate(-50%,0)}
+    #exhibit{position:fixed;inset:0;background:rgba(5,6,8,.97);z-index:40;display:none;align-items:center;justify-content:center;padding:5vw}#exhibit.open{display:flex}#exhibitCanvas{width:min(88vmin,900px);aspect-ratio:1;border:12px solid #1a1c22;box-shadow:0 0 100px #ffffff18}#exhibitCanvas canvas{width:100%!important;height:100%!important;display:block}#closeExhibit{position:absolute;right:24px;top:24px}
+    @media(max-width:900px){.workspace{grid-template-columns:1fr}.art-stage{order:1}.controls{order:2}.hero{padding-top:42px}.topbar{flex-wrap:wrap}.controls{padding:20px}}@media(max-width:560px){.metadata{grid-template-columns:1fr 1fr}.metadata .meta:last-child{grid-column:1/-1}.audio-panel{grid-template-columns:1fr}.audio-actions{justify-content:space-between}.stage-actions .btn{flex:1 1 42%}.topnav{gap:5px}.navlink,.lang button{padding:8px}.hero{padding-bottom:27px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">FORM<span> / </span>STUDIO</a>
+    <nav class="topnav" aria-label="Main navigation">
+      <div class="lang" aria-label="Language"><button id="koBtn" class="active" type="button">KO</button><button id="enBtn" type="button">EN</button></div>
+      <a class="navlink" href="museum.html" id="museumLink">MUSEUM ↗</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">GENERATIVE ART / NO MODEL REQUIRED</div>
+    <h1 id="headline">형태와 우연 사이,
+나만의 작품을 만들다.</h1>
+    <p class="intro" id="intro">12가지 독립적인 조형 알고리즘으로 색, 구조, 흔적, 공간을 탐구합니다. 모든 작업은 브라우저에서 계산되며, 작가명과 시드를 저장하면 언제든 같은 작품을 다시 만들 수 있습니다.</p>
+  </section>
+
+  <main class="workspace">
+    <section class="controls" aria-label="작품 생성 설정">
+      <div class="field"><label for="artist">ARTIST / 작가명</label><input id="artist" maxlength="28" autocomplete="off" placeholder="작가명을 입력하세요"></div>
+      <div class="field"><label for="style">VISUAL LANGUAGE / 조형 언어</label><select id="style"></select><p class="hint" id="styleHint"></p></div>
+      <div class="field"><label for="seed">SEED / 작품 고유값</label><input id="seed" inputmode="numeric" maxlength="12" placeholder="비워두면 자동 생성"><p class="hint">동일한 작가명·스타일·시드를 입력하면 같은 결과를 재현합니다.</p></div>
+      <div class="button-row"><button class="btn primary" id="createBtn" type="button">작품 생성하기</button><button class="btn" id="randomBtn" type="button">새 시드 ↻</button></div>
+      <div class="divider"></div>
+      <div><div class="section-label">CURATOR'S NOTES / 조형 분석</div><div class="note-list" id="notes"><p class="hint">작품을 생성하면 선택한 알고리즘의 조형적 특징을 설명합니다.</p></div></div>
+      <div class="divider"></div>
+      <div><div class="section-label">AMBIENT SOUND / 공간 음향</div><p class="hint">작품의 색조에 반응하는 저음 패드와 미세한 공간 질감입니다. 재생은 직접 버튼을 눌렀을 때만 시작됩니다.</p></div>
+      <div class="audio-panel"><div class="audio-actions"><button class="btn" id="audioBtn" type="button">사운드 켜기</button><label class="hint" for="volume">VOLUME</label><input class="volume" id="volume" type="range" min="0" max="65" value="42"></div><span class="hint" id="audioStatus">OFF / USER CONTROLLED</span></div>
+      <div class="divider"></div>
+      <div><div class="section-label">MUSEUM ARCHIVE</div><p class="hint">게시된 작품은 공개 갤러리에 전시됩니다. 삭제 권한은 게시 당시의 익명 Firebase 계정에 연결됩니다. 브라우저 데이터가 사라지면 소유권 복구가 어려울 수 있습니다.</p></div>
+      <button class="btn" id="publishBtn" type="button" disabled>뮤지엄에 작품 게시</button>
+    </section>
+
+    <section class="art-stage" aria-label="작품 미리보기">
+      <div class="stage-head"><span class="stage-title">CANVAS / LIVE PREVIEW</span><span class="status" id="status" aria-live="polite">READY</span></div>
+      <div id="canvasHost"><div class="placeholder">작가명과 조형 언어를 선택한 뒤<br>작품 생성하기를 눌러주세요.</div></div>
+      <div class="metadata"><div class="meta"><small>ARTIST</small><span id="metaArtist">—</span></div><div class="meta"><small>STYLE</small><span id="metaStyle">—</span></div><div class="meta"><small>SEED</small><span id="metaSeed">—</span></div></div>
+      <div class="stage-actions"><button class="btn" id="exportBtn" type="button" disabled>3000px 고해상도 저장</button><button class="btn" id="shareBtn" type="button" disabled>작품 링크 복사</button><button class="btn" id="exhibitBtn" type="button" disabled>전시 모드</button></div>
+    </section>
+  </main>
+
+  <p class="footnote">FORM은 외부 AI 모델을 호출하지 않는 브라우저 기반 생성형 미술 프로젝트입니다. 작품은 알고리즘과 난수 시드로 생성되며, 특정 작가의 원작을 복제하거나 학습한 결과물이 아닙니다. 고해상도 내보내기는 3000 × 3000 px JPG입니다. 생성 결과의 미적 완성도는 주관적이며, 이 도구가 인간 작가의 창작·판단을 대체한다고 주장하지 않습니다.</p>
+
+  <div id="exhibit" role="dialog" aria-modal="true" aria-label="전시 모드"><button id="closeExhibit" class="btn" type="button">닫기 ✕</button><div id="exhibitCanvas"></div></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script src="art-engine.js"></script>
+  <script src="audio-engine.js"></script>
+  <script src="studio.js"></script>
+</body>
+</html>
