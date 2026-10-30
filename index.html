@@ -109,7 +109,7 @@
     
     // Config가 더미값이 아닐 때만 초기화 진행
     let db;
-    if(firebaseConfig.apiKey !== "AIzaSyBV08YxtJZ0y6NgXOlRG26mna-jEfsS5tk") {
+    if(firebaseConfig.apiKey !== "더미API") {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
     }
