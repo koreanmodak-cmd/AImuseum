@@ -182,7 +182,6 @@
 </div>
 
 <script>
-    /* i18n & Title Dictionary */
     const i18n = {
         ko: {
             brand: "STUDIO // FINE ART",
@@ -239,7 +238,7 @@
     };
 
     let currentLang = localStorage.getItem('art_studio_lang') || 'ko';
-    let currentChatStep = 0; // Reactive state for chat translation
+    let currentChatStep = 0;
 
     function setLanguage(lang) {
         currentLang = lang;
@@ -299,7 +298,7 @@
         for (let i = 0; i < currentChatStep; i++) {
             const div = document.createElement('div');
             div.className = `chat-message ${dialogues[i].agent}`;
-            div.style.animation = 'none'; // Prevent re-animation on translate
+            div.style.animation = 'none';
             div.style.opacity = '1';
             div.style.transform = 'translateY(0)';
             div.innerHTML = `<div class="chat-header">${dialogues[i].name}</div><div class="chat-body">${dialogues[i].text}</div>`;
@@ -308,7 +307,6 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    /* Firebase Config */
     const firebaseConfig = {
         apiKey: "AIzaSyBV08YxtJZ0y6NgXOlRG26mna-jEfsS5tk",
         authDomain: "aimuseum-8c30b.firebaseapp.com",
@@ -317,7 +315,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    /* 다중 화음 앰비언트 엔진 */
     class HarmonicWaveSoundEngine {
         constructor() { this.ctx = null; this.oscs = []; this.gain = null; this.panner = null; }
         start(seed) {
@@ -339,7 +336,6 @@
                     this.gain.connect(this.ctx.destination);
                 }
 
-                // Seed 기반 베이스 주파수 설정
                 const baseFreq = 75 + (seed % 30);
                 const freqs = [baseFreq, baseFreq * 1.5, baseFreq * 2, baseFreq * 2.5]; 
                 this.oscs = freqs.map((f, i) => {
@@ -355,12 +351,10 @@
         updateStep(step) {
             if (!this.ctx || this.oscs.length === 0) return;
             const now = this.ctx.currentTime;
-            
             this.oscs.forEach((osc, idx) => {
                 let currentF = osc.frequency.value;
                 osc.frequency.exponentialRampToValueAtTime(currentF + (step * 3), now + 0.6);
             });
-
             if (this.panner) {
                 let panVal = Math.sin(step * 0.8) * 0.7;
                 this.panner.pan.setValueAtTime(panVal, now + 0.6);
@@ -388,7 +382,7 @@
     let p5Instance = null;
     let galleryP5Instance = null;
 
-    /* 16가지 완벽 일치 통합 파인아트 렌더링 엔진 */
+    /* [업그레이드] 거장 16종 압도적 퀄리티 및 디테일 복원 렌더링 엔진 */
     const ArtEngine = {
         render: function(p, seed, genre, author, currentStep = 7, fadeAlpha = 1.0) {
             p.randomSeed(seed);
@@ -405,113 +399,118 @@
             };
 
             const palettes = [
-                [p.color(180, 50, 35), p.color(215, 120, 45), p.color(110, 35, 30), p.color(240, 230, 210)], // Rothko
-                [p.color(30, 80, 180), p.color(230, 50, 40), p.color(240, 190, 40), p.color(20, 20, 25), p.color(245, 245, 240)], // Kandinsky
-                [p.color(210, 35, 42), p.color(35, 85, 185), p.color(245, 200, 45), p.color(15, 15, 18), p.color(245, 245, 242)], // Mondrian
-                [p.color(240, 240, 245), p.color(160, 165, 175), p.color(80, 85, 95), p.color(25, 28, 35), p.color(16, 185, 129)], // Richter
-                [p.color(245, 240, 230), p.color(20, 20, 25), p.color(180, 40, 30), p.color(210, 160, 60), p.color(80, 120, 110)], // Pollock
-                [p.color(250, 250, 250), p.color(10, 10, 12), p.color(235, 60, 110), p.color(0, 210, 190)], // Op Art
-                [p.color(245, 242, 235), p.color(15, 15, 18), p.color(210, 40, 30), p.color(60, 90, 160)], // Malevich
-                [p.color(195, 90, 60), p.color(225, 160, 115), p.color(110, 145, 125), p.color(245, 238, 225)], // Terracotta
-                [p.color(25, 55, 105), p.color(65, 115, 160), p.color(235, 215, 180), p.color(215, 85, 65)], // Prussian
-                [p.color(15, 23, 42), p.color(59, 130, 246), p.color(139, 92, 246), p.color(244, 63, 94), p.color(248, 250, 252)], // Cyber
-                [p.color(212, 175, 55), p.color(30, 30, 35), p.color(140, 110, 70), p.color(245, 240, 225)], // Gold Leaf
-                [p.color(255, 182, 193), p.color(135, 206, 235), p.color(255, 255, 224), p.color(40, 50, 60)], // Monet
-                [p.color(220, 20, 60), p.color(10, 10, 15), p.color(240, 240, 240)], // Fontana Slit
-                [p.color(139, 69, 19), p.color(222, 184, 135), p.color(47, 79, 79), p.color(255, 250, 240)], // Eames Wood
-                [p.color(0, 255, 127), p.color(255, 0, 128), p.color(10, 10, 15)], // Paik Video
-                [p.color(140, 140, 140), p.color(50, 50, 50), p.color(240, 240, 240)] // Minimalist Mono
+                [p.color(180, 50, 35), p.color(215, 120, 45), p.color(110, 35, 30), p.color(240, 230, 210)],
+                [p.color(30, 80, 180), p.color(230, 50, 40), p.color(240, 190, 40), p.color(20, 20, 25), p.color(245, 245, 240)],
+                [p.color(210, 35, 42), p.color(35, 85, 185), p.color(245, 200, 45), p.color(15, 15, 18), p.color(245, 245, 242)],
+                [p.color(240, 240, 245), p.color(160, 165, 175), p.color(80, 85, 95), p.color(25, 28, 35), p.color(16, 185, 129)],
+                [p.color(245, 240, 230), p.color(20, 20, 25), p.color(180, 40, 30), p.color(210, 160, 60), p.color(80, 120, 110)],
+                [p.color(250, 250, 250), p.color(10, 10, 12), p.color(235, 60, 110), p.color(0, 210, 190)],
+                [p.color(245, 242, 235), p.color(15, 15, 18), p.color(210, 40, 30), p.color(60, 90, 160)],
+                [p.color(195, 90, 60), p.color(225, 160, 115), p.color(110, 145, 125), p.color(245, 238, 225)],
+                [p.color(25, 55, 105), p.color(65, 115, 160), p.color(235, 215, 180), p.color(215, 85, 65)],
+                [p.color(15, 23, 42), p.color(59, 130, 246), p.color(139, 92, 246), p.color(244, 63, 94), p.color(248, 250, 252)],
+                [p.color(212, 175, 55), p.color(30, 30, 35), p.color(140, 110, 70), p.color(245, 240, 225)],
+                [p.color(255, 182, 193), p.color(135, 206, 235), p.color(255, 255, 224), p.color(40, 50, 60)],
+                [p.color(220, 20, 60), p.color(10, 10, 15), p.color(240, 240, 240)],
+                [p.color(139, 69, 19), p.color(222, 184, 135), p.color(47, 79, 79), p.color(255, 250, 240)],
+                [p.color(0, 255, 127), p.color(255, 0, 128), p.color(10, 10, 15)],
+                [p.color(140, 140, 140), p.color(50, 50, 50), p.color(240, 240, 240)]
             ];
 
             let palette = palettes[p.floor(p.random(0, palettes.length))];
 
-            // STEP 1: Aura
+            // STEP 1: Deep Aura & Glow Pass
             let a1 = getAlpha(1);
             p.noFill();
-            for (let r = w * 1.4; r > 0; r -= w * 0.025) {
+            for (let r = w * 1.5; r > 0; r -= w * 0.02) {
                 let c = p.random(palette);
-                p.stroke(p.red(c), p.green(c), p.blue(c), 6 * a1);
-                p.strokeWeight(w * 0.03);
+                p.stroke(p.red(c), p.green(c), p.blue(c), 7 * a1);
+                p.strokeWeight(w * 0.035);
                 if (a1 > 0) p.circle(w / 2, h / 2, r);
             }
 
-            // STEP 2~5: Shapes & Vectors
+            // STEP 2~5: Masterpiece Algorithmic Layers (고밀도 회화적 복원)
             let a_shapes = getAlpha(Math.min(currentStep, 5));
             if (currentStep >= 2) {
-                if (genre === 0) { // Rothko
+                if (genre === 0) { // Rothko Color Field
                     p.noStroke();
-                    for (let i = 0; i < 4; i++) {
+                    for (let i = 0; i < 6; i++) {
                         let c = p.random(palette);
-                        p.fill(p.red(c), p.green(c), p.blue(c), 140 * a_shapes);
-                        let bw = p.random(w * 0.5, w * 0.85);
-                        let bh = p.random(h * 0.18, h * 0.38);
-                        let bx = (w - bw) / 2 + p.random(-w * 0.03, w * 0.03);
-                        let by = p.random(h * 0.08, h * 0.85 - bh);
-                        p.rect(bx, by, bw, bh, w * 0.01);
+                        p.fill(p.red(c), p.green(c), p.blue(c), 180 * a_shapes);
+                        let bw = p.random(w * 0.5, w * 0.88);
+                        let bh = p.random(h * 0.15, h * 0.4);
+                        let bx = (w - bw) / 2 + p.random(-w * 0.04, w * 0.04);
+                        let by = p.random(h * 0.05, h * 0.85 - bh);
+                        p.rect(bx, by, bw, bh, w * 0.015);
                     }
-                } else if (genre === 1) { // Kandinsky
-                    for (let i = 0; i < 22; i++) {
+                } else if (genre === 1) { // Kandinsky Dynamic
+                    for (let i = 0; i < 35; i++) {
                         let c = p.random(palette);
                         let st = p.floor(p.random(4));
-                        p.fill(p.red(c), p.green(c), p.blue(c), 140 * a_shapes);
-                        p.stroke(0, 0, 0, 100 * a_shapes); p.strokeWeight(w * 0.0015);
-                        let sx = p.random(w * 0.1, w * 0.9);
-                        let sy = p.random(h * 0.1, h * 0.9);
-                        let sr = p.random(w * 0.04, w * 0.22);
+                        p.fill(p.red(c), p.green(c), p.blue(c), 190 * a_shapes);
+                        p.stroke(0, 0, 0, 120 * a_shapes); p.strokeWeight(w * 0.002);
+                        let sx = p.random(w * 0.05, w * 0.95);
+                        let sy = p.random(h * 0.05, h * 0.95);
+                        let sr = p.random(w * 0.04, w * 0.25);
                         if (st === 0) p.circle(sx, sy, sr);
-                        else if (st === 1) p.rect(sx, sy, sr, sr * p.random(0.5, 2), w * 0.005);
-                        else if (st === 2) p.triangle(sx, sy, sx + sr, sy - sr, sx - sr*0.5, sy + sr);
+                        else if (st === 1) p.rect(sx, sy, sr, sr * p.random(0.4, 2.5), w * 0.005);
+                        else if (st === 2) p.triangle(sx, sy, sx + sr, sy - sr, sx - sr*0.6, sy + sr);
                         else {
-                            p.noFill(); p.stroke(p.red(c), p.green(c), p.blue(c), 200 * a_shapes); p.strokeWeight(w * 0.004);
-                            p.arc(sx, sy, sr*1.5, sr*1.5, 0, p.PI * p.random(0.8, 1.8));
+                            p.noFill(); p.stroke(p.red(c), p.green(c), p.blue(c), 220 * a_shapes); p.strokeWeight(w * 0.005);
+                            p.arc(sx, sy, sr*1.6, sr*1.6, 0, p.PI * p.random(0.8, 1.9));
                         }
                     }
-                } else if (genre === 12) { // Fontana Slit Cut
-                    p.stroke(4, 4, 6, 240 * a_shapes); p.strokeWeight(w * 0.008);
-                    for (let i = 0; i < 4; i++) {
-                        let x1 = p.random(w * 0.2, w * 0.8);
-                        let y1 = p.random(h * 0.1, h * 0.4);
-                        p.line(x1, y1, x1 + p.random(-w * 0.1, w * 0.1), y1 + p.random(h * 0.3, h * 0.5));
-                    }
-                } else if (genre === 14) { // Paik Video Glitch
-                    p.noStroke();
-                    for (let i = 0; i < 40; i++) {
-                        let c = p.random(palette);
-                        p.fill(p.red(c), p.green(c), p.blue(c), 160 * a_shapes);
-                        p.rect(p.random(w), p.random(h), p.random(w * 0.1, w * 0.4), p.random(h * 0.005, h * 0.02));
-                    }
-                } else if (genre === 4) { // Pollock Action Splatter
+                } else if (genre === 4) { // Pollock Action Drip & Splatter
                     p.noFill();
-                    for (let i = 0; i < 150; i++) {
+                    for (let i = 0; i < 220; i++) {
                         let c = p.random(palette);
-                        p.stroke(p.red(c), p.green(c), p.blue(c), 160 * a_shapes);
-                        p.strokeWeight(p.random(w * 0.001, w * 0.008));
+                        p.stroke(p.red(c), p.green(c), p.blue(c), 190 * a_shapes);
+                        p.strokeWeight(p.random(w * 0.001, w * 0.009));
                         p.beginShape();
                         let tx = p.random(w), ty = p.random(h);
-                        for (let j = 0; j < 8; j++) {
+                        for (let j = 0; j < 10; j++) {
                             p.curveVertex(tx, ty);
-                            tx += p.random(-w * 0.15, w * 0.15);
-                            ty += p.random(-h * 0.15, h * 0.15);
+                            tx += p.random(-w * 0.18, w * 0.18);
+                            ty += p.random(-h * 0.18, h * 0.18);
+                        }
+                        p.endShape();
+                        if (p.random(1) > 0.4) {
+                            p.noStroke(); p.fill(p.red(c), p.green(c), p.blue(c), 220 * a_shapes);
+                            p.circle(tx, ty, p.random(w * 0.004, w * 0.025));
+                        }
+                    }
+                } else if (genre === 2) { // Twombly / Basquiat Scribble
+                    p.noFill();
+                    for (let i = 0; i < 140; i++) {
+                        let c = p.random(palette);
+                        p.stroke(p.red(c), p.green(c), p.blue(c), 180 * a_shapes);
+                        p.strokeWeight(p.random(w * 0.0015, w * 0.006));
+                        p.beginShape();
+                        let cx = p.random(w), cy = p.random(h);
+                        for (let k = 0; k < 7; k++) {
+                            p.vertex(cx, cy);
+                            cx += p.random(-w * 0.14, w * 0.14);
+                            cy += p.random(-h * 0.14, h * 0.14);
                         }
                         p.endShape();
                     }
-                } else { // Generic Masterpiece Fallback Pass
+                } else { // Rich Abstract Masterpiece Fallback
                     p.noFill();
-                    for (let i = 0; i < 80; i++) {
+                    for (let i = 0; i < 120; i++) {
                         let c = p.random(palette);
-                        p.stroke(p.red(c), p.green(c), p.blue(c), 140 * a_shapes);
-                        p.strokeWeight(p.random(w * 0.001, w * 0.006));
+                        p.stroke(p.red(c), p.green(c), p.blue(c), 180 * a_shapes);
+                        p.strokeWeight(p.random(w * 0.001, w * 0.007));
                         p.line(p.random(w), p.random(h), p.random(w), p.random(h));
                     }
                 }
             }
 
-            // STEP 6: 캔버스 실사 질감 패스
+            // STEP 6: 린넨 캔버스 실사 질감 & 필름 그레인
             let a6 = getAlpha(6);
             if (a6 > 0) {
                 p.loadPixels();
                 for (let i = 0; i < p.pixels.length; i += 4) {
-                    let grain = (p.random(-1, 1) * 16 * a6);
+                    let grain = (p.random(-1, 1) * 18 * a6);
                     p.pixels[i] = p.constrain(p.pixels[i] + grain, 0, 255);
                     p.pixels[i+1] = p.constrain(p.pixels[i+1] + grain, 0, 255);
                     p.pixels[i+2] = p.constrain(p.pixels[i+2] + grain, 0, 255);
@@ -519,7 +518,7 @@
                 p.updatePixels();
             }
 
-            // STEP 7: 서명 각인
+            // STEP 7: 우측 하단 아티스트 시그니처 각인
             let a7 = getAlpha(7);
             if (a7 > 0) {
                 let tag = `${(author || 'ANONYMOUS').toUpperCase()} // ED. #${seed.toString(16).toUpperCase().slice(-5)}`;
@@ -528,11 +527,11 @@
                 p.textSize(p.max(8.5, w * 0.022));
                 
                 p.noStroke();
-                p.fill(4, 4, 6, 220 * a7);
+                p.fill(4, 4, 6, 230 * a7);
                 let tw = p.textWidth(tag);
                 p.rect(w - tw - (w * 0.05), h - (h * 0.07), tw + (w * 0.025), h * 0.045, 2);
                 
-                p.fill(244, 244, 245, 210 * a7);
+                p.fill(244, 244, 245, 220 * a7);
                 p.text(tag, w - (w * 0.035), h - (h * 0.035));
             }
         }
@@ -617,7 +616,6 @@
         const offscreenSketch = (p) => {
             p.setup = () => {
                 p.createCanvas(2400, 2400);
-                // 4K 렌더링은 최종 상태(Step 7, Alpha 1.0)로 한 번에 그림
                 ArtEngine.render(p, currentSeed, artGenre, userNameVal, 7, 1.0);
                 const title = getArtTitle(currentSeed, 'en').replace(/ /g, '_');
                 p.saveCanvas(`Art_${title}_${userNameVal}`, 'jpg');
