@@ -4,37 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Museum : 박물관</title>
+    <!-- p5.js 및 Firebase SDK -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
+        * { box-sizing: border-box; }
         body {
             margin: 0; background: #0f172a; color: white;
             font-family: 'Pretendard', sans-serif; padding: 20px;
+            min-height: 100vh;
         }
         header {
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 30px;
+            flex-wrap: wrap; gap: 10px;
         }
+        header h1 { margin: 0; font-size: 1.5rem; }
+        .back-link { color: #3b82f6; text-decoration: none; font-weight: bold; font-size: 0.95rem; }
+        .back-link:hover { text-decoration: underline; }
         .gallery {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 25px;
         }
         .art-card {
-            background: #1e293b; border-radius: 10px; padding: 15px;
+            background: #1e293b; border-radius: 12px; padding: 16px;
             display: flex; flex-direction: column; align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4); border: 1px solid #334155;
         }
-        .art-title { margin-top: 10px; font-weight: bold; color: #3b82f6; }
-        .art-date { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
-        a { color: #3b82f6; text-decoration: none; font-weight: bold; }
+        .art-title { margin-top: 12px; font-weight: bold; color: #f8fafc; font-size: 1rem; }
+        #loading { font-size: 1rem; color: #94a3b8; grid-column: 1 / -1; text-align: center; padding: 40px; }
     </style>
 </head>
 <body>
 
 <header>
     <h1>🏛️ AI 전시장 (Museum)</h1>
-    <a href="index.html">← 작업실로 돌아가기</a>
+    <a href="index.html" class="back-link">← 작업실로 돌아가기</a>
 </header>
 
 <div class="gallery" id="gallery">
@@ -42,6 +48,9 @@
 </div>
 
 <script>
+    /* =========================================
+       1. Firebase 초기화
+       ========================================= */
     const firebaseConfig = {
         apiKey: "AIzaSyBV08YxtJZ0y6NgXOlRG26mna-jEfsS5tk",
         authDomain: "aimuseum-8c30b.firebaseapp.com",
@@ -50,7 +59,9 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // 한글 초성/중성 분해
+    /* =========================================
+       2. 한글 분해 함수
+       ========================================= */
     function extractHangul(str) {
         const chosung = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
         const jungsung = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
@@ -64,18 +75,21 @@
                 result.push(str[i]);
             }
         }
-        return result.length > 0 ? result : ["X", "O"];
+        return result.length > 0 ? result : ["A", "R", "T"];
     }
 
-    // Firestore에서 저장된 작품 불러오기
+    /* =========================================
+       3. 데이터베이스 읽기 및 갤러리 렌더링
+       ========================================= */
     async function loadMuseum() {
         const gallery = document.getElementById('gallery');
         try {
-            const snapshot = await db.collection("museum_arts").orderBy("createdAt", "desc").limit(20).get();
-            document.getElementById('loading').remove();
+            const snapshot = await db.collection("museum_arts").orderBy("createdAt", "desc").limit(24).get();
+            const loading = document.getElementById('loading');
+            if (loading) loading.remove();
 
-            if(snapshot.empty) {
-                gallery.innerHTML = "<div>아직 전시된 작품이 없습니다.</div>";
+            if (snapshot.empty) {
+                gallery.innerHTML = "<div style='color:#94a3b8; grid-column: 1/-1; text-align:center;'>아직 전시된 작품이 없습니다. 첫 작품을 전시해보세요!</div>";
                 return;
             }
 
@@ -84,26 +98,24 @@
                 const card = document.createElement('div');
                 card.className = 'art-card';
                 card.innerHTML = `
-                    <div id="p5-art-${idx}"></div>
+                    <div id="p5-art-${idx}" style="border-radius: 6px; overflow: hidden;"></div>
                     <div class="art-title">${data.author || '무명'}의 작품</div>
                 `;
                 gallery.appendChild(card);
 
-                // p5.js 캔버스 렌더링 (인스턴스 모드)
                 new p5((p) => {
                     p.setup = () => {
-                        let canvas = p.createCanvas(250, 250);
+                        let canvas = p.createCanvas(230, 230);
                         p.randomSeed(data.seed);
                         p.noiseSeed(data.seed);
                         
-                        p.background(20, 25, 30);
+                        p.background(15, 23, 42);
                         let colors = [
-                            p.color(p.random(255), p.random(100), p.random(100)),
-                            p.color(p.random(100), p.random(255), p.random(100)),
-                            p.color(p.random(100), p.random(100), p.random(255))
+                            p.color(p.random(180, 255), p.random(50, 120), p.random(80, 150)),
+                            p.color(p.random(50, 120), p.random(180, 255), p.random(180, 255)),
+                            p.color(p.random(230, 255), p.random(180, 240), p.random(50, 100))
                         ];
 
-                        // 장르별 드로잉
                         if (data.genre === 0) {
                             p.noStroke();
                             for (let i = 0; i < 15; i++) {
@@ -118,28 +130,34 @@
                                 let x = p.random(p.width), y = p.random(p.height);
                                 for (let j = 0; j < 15; j++) {
                                     p.vertex(x, y);
-                                    let angle = p.noise(x * 0.01, y * 0.01) * p.TWO_PI * 4;
+                                    let angle = p.noise(x * 0.008, y * 0.008) * p.TWO_PI * 4;
                                     x += p.cos(angle) * 8; y += p.sin(angle) * 8;
                                 }
                                 p.endShape();
                             }
-                        } else {
+                        } else if (data.genre === 2) {
                             p.strokeWeight(p.random(1, 3));
-                            for (let i = 0; i < 80; i++) {
+                            for (let i = 0; i < 100; i++) {
                                 p.stroke(p.random(colors));
                                 p.line(p.random(p.width), p.random(p.height), p.random(p.width), p.random(p.height));
                             }
+                        } else {
+                            p.noStroke();
+                            for (let i = 0; i < 12; i++) {
+                                let c = p.random(colors);
+                                p.fill(p.red(c), p.green(c), p.blue(c), p.random(70, 140));
+                                p.circle(p.random(p.width), p.random(p.height), p.random(80, 250));
+                            }
                         }
 
-                        // 한글 문자 흩뿌리기
                         let letters = extractHangul(data.author || '무명');
                         p.textAlign(p.CENTER, p.CENTER);
                         for (let l of letters) {
                             p.push();
                             p.translate(p.random(p.width), p.random(p.height));
                             p.rotate(p.random(p.TWO_PI));
-                            p.fill(255, 255, 255, p.random(50, 120));
-                            p.textSize(p.random(20, 80));
+                            p.fill(255, 255, 255, p.random(80, 180));
+                            p.textSize(p.random(20, 70));
                             p.text(l, 0, 0);
                             p.pop();
                         }
@@ -149,7 +167,7 @@
             });
         } catch (e) {
             console.error(e);
-            gallery.innerHTML = "<div>작품을 불러오는 중 오류가 발생했습니다 (Firebase 규칙 확인 필요).</div>";
+            gallery.innerHTML = "<div style='color:#ef4444; grid-column: 1/-1;'>작품을 불러오는 중 오류가 발생했습니다. (Firebase 보안 규칙을 확인하세요)</div>";
         }
     }
 
