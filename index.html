@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI WORKSPACE : Generative Studio</title>
+    <title>AI WORKSPACE : Masterpiece Generative Studio</title>
     <!-- p5.js 및 Firebase SDK -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -12,9 +12,9 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         :root {
-            --bg-dark: #09090b;
-            --panel-bg: #111115;
-            --panel-border: rgba(255, 255, 255, 0.07);
+            --bg-dark: #08080a;
+            --panel-bg: #101014;
+            --panel-border: rgba(255, 255, 255, 0.08);
             --text-main: #f4f4f5;
             --text-muted: #71717a;
             --agent-red: #f43f5e;
@@ -30,7 +30,7 @@
         }
 
         header {
-            padding: 18px 32px; background: rgba(9, 9, 11, 0.95);
+            padding: 18px 32px; background: rgba(8, 8, 10, 0.95);
             border-bottom: 1px solid var(--panel-border);
             display: flex; gap: 20px; align-items: center; justify-content: space-between;
             backdrop-filter: blur(12px);
@@ -54,7 +54,7 @@
         
         .btn-primary {
             padding: 9px 18px; border: 1px solid var(--panel-border); border-radius: 4px; cursor: pointer;
-            background: #f4f4f5; color: #09090b; font-weight: 600; font-size: 0.82rem;
+            background: #f4f4f5; color: #08080a; font-weight: 600; font-size: 0.82rem;
             transition: 0.2s; white-space: nowrap; letter-spacing: 0.5px;
         }
         .btn-primary:hover { background: #e4e4e7; }
@@ -64,7 +64,7 @@
         .chat-panel {
             flex: 1; min-width: 320px; max-width: 36%; background: var(--panel-bg);
             padding: 28px; overflow-y: auto; border-right: 1px solid var(--panel-border);
-            display: flex; flex-direction: column; gap: 18px; height: calc(100vh - 65px);
+            display: flex; flex-direction: column; gap: 16px; height: calc(100vh - 65px);
         }
         .chat-placeholder { color: var(--text-muted); font-size: 0.82rem; line-height: 1.7; margin: auto 0; text-align: center; font-weight: 300; }
 
@@ -76,7 +76,7 @@
 
         .chat-message {
             opacity: 0; transform: translateY(10px); animation: fadeIn 0.35s forwards ease-out;
-            display: flex; flex-direction: column; gap: 6px;
+            display: flex; flex-direction: column; gap: 5px;
         }
         .chat-header { font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; font-family: monospace; }
         .chat-header::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; }
@@ -89,21 +89,21 @@
         .agent-green .chat-header::before { background: var(--agent-green); }
 
         .chat-body {
-            background: rgba(255, 255, 255, 0.02); padding: 14px 16px; border-radius: 4px;
-            font-size: 0.85rem; line-height: 1.6; color: #a1a1aa; border: 1px solid rgba(255,255,255,0.03); font-weight: 300;
+            background: rgba(255, 255, 255, 0.02); padding: 13px 15px; border-radius: 4px;
+            font-size: 0.84rem; line-height: 1.6; color: #a1a1aa; border: 1px solid rgba(255,255,255,0.03); font-weight: 300;
         }
 
         #p5-container {
-            box-shadow: 0 30px 60px rgba(0,0,0,0.9); border-radius: 2px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.95); border-radius: 2px;
             border: 1px solid rgba(255,255,255,0.08); overflow: hidden;
         }
         
         .action-buttons {
-            margin-top: 24px; display: none; gap: 12px; justify-content: center;
+            margin-top: 24px; display: none; gap: 10px; justify-content: center; flex-wrap: wrap;
         }
         .btn-secondary {
-            padding: 9px 18px; border-radius: 4px; border: 1px solid var(--panel-border);
-            background: #111115; color: #e4e4e7; font-size: 0.82rem; font-weight: 500;
+            padding: 9px 16px; border-radius: 4px; border: 1px solid var(--panel-border);
+            background: #111115; color: #e4e4e7; font-size: 0.8rem; font-weight: 500;
             cursor: pointer; transition: 0.2s; letter-spacing: 0.5px;
         }
         .btn-secondary:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); color: #fff; }
@@ -133,12 +133,13 @@
 
 <div class="main-container">
     <div class="chat-panel" id="chatBox">
-        <div class="chat-placeholder">Enter an artist name to initiate synthesis between Agent Red, Yellow, and Green.</div>
+        <div class="chat-placeholder">Enter an artist name to initiate multi-agent curatorial synthesis.</div>
     </div>
     <div class="canvas-panel">
         <div id="p5-container"></div>
         <div class="action-buttons" id="actionBtns">
             <button class="btn-secondary" onclick="export4KCanvas()">Export 4K Canvas</button>
+            <button class="btn-secondary" onclick="sharePermalink()">Share Link</button>
             <button class="btn-secondary" onclick="saveToMuseum()">Publish to Museum</button>
         </div>
     </div>
@@ -154,107 +155,264 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
+    /* Web Audio API 오디오 앰비언트 엔진 */
+    class AmbientSoundEngine {
+        constructor() { this.ctx = null; this.osc = null; this.gain = null; }
+        start() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                this.ctx = new AudioCtx();
+                this.osc = this.ctx.createOscillator();
+                this.gain = this.ctx.createGain();
+                this.osc.type = 'sine';
+                this.osc.frequency.setValueAtTime(98, this.ctx.currentTime);
+                this.gain.gain.setValueAtTime(0.001, this.ctx.currentTime);
+                this.gain.gain.exponentialRampToValueAtTime(0.035, this.ctx.currentTime + 0.8);
+                this.osc.connect(this.gain);
+                this.gain.connect(this.ctx.destination);
+                this.osc.start();
+            } catch(e) {}
+        }
+        updatePitch(step) {
+            if (!this.ctx || !this.osc) return;
+            let freq = 98 + (step * 18);
+            this.osc.frequency.exponentialRampToValueAtTime(freq, this.ctx.currentTime + 0.5);
+        }
+        stop() {
+            if (!this.ctx) return;
+            try {
+                this.gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.6);
+                setTimeout(() => { if(this.osc) this.osc.stop(); if(this.ctx) this.ctx.close(); }, 700);
+            } catch(e) {}
+        }
+    }
+
+    const soundEngine = new AmbientSoundEngine();
     let currentSeed = 0;
     let userNameVal = "";
     let artGenre = 0;
     let currentDialogue = [];
     let p5Instance = null;
 
-    /* 단일 통합 생성형 아트 엔진 (단계별 드로잉 & 상대좌표계 완전 보장) */
+    /* 거장 스타일 이식 2세대 Masterpiece Generative Engine */
     const ArtEngine = {
-        renderStep: function(p, seed, genre, author, maxStep) {
+        renderStep: function(p, seed, genre, author, currentStep, totalSteps) {
             p.randomSeed(seed);
             p.noiseSeed(seed);
             
             const w = p.width;
             const h = p.height;
 
+            p.background(6, 6, 8);
+
+            // 10가지 세련된 파인아트 칼라 팔레트
             const palettes = [
-                [p.color(240, 240, 245), p.color(160, 160, 175), p.color(80, 80, 90), p.color(225, 29, 72)],
-                [p.color(225, 29, 72), p.color(234, 179, 8), p.color(30, 58, 138), p.color(248, 250, 252)],
-                [p.color(20, 184, 166), p.color(99, 102, 241), p.color(244, 63, 94), p.color(255, 255, 255)],
-                [p.color(217, 119, 6), p.color(180, 83, 9), p.color(120, 53, 15), p.color(254, 243, 199)],
-                [p.color(244, 114, 182), p.color(129, 140, 248), p.color(52, 211, 153), p.color(30, 41, 59)],
-                [p.color(255, 255, 255), p.color(120, 120, 130), p.color(40, 40, 48), p.color(16, 185, 129)]
+                // 0: Rothko Warm Field
+                [p.color(180, 50, 35), p.color(215, 120, 45), p.color(110, 35, 30), p.color(240, 230, 210)],
+                // 1: Kandinsky Dynamic
+                [p.color(30, 80, 180), p.color(230, 50, 40), p.color(240, 190, 40), p.color(20, 20, 25), p.color(245, 245, 240)],
+                // 2: De Stijl Primary
+                [p.color(210, 35, 42), p.color(35, 85, 185), p.color(245, 200, 45), p.color(15, 15, 18), p.color(245, 245, 242)],
+                // 3: Richter Squeegee Charcoal
+                [p.color(240, 240, 245), p.color(160, 165, 175), p.color(80, 85, 95), p.color(25, 28, 35), p.color(16, 185, 129)],
+                // 4: Pollock Action Splash
+                [p.color(245, 240, 230), p.color(20, 20, 25), p.color(180, 40, 30), p.color(210, 160, 60), p.color(80, 120, 110)],
+                // 5: Op Art Moiré
+                [p.color(250, 250, 250), p.color(10, 10, 12), p.color(235, 60, 110), p.color(0, 210, 190)],
+                // 6: Suprematism Malevich
+                [p.color(245, 242, 235), p.color(15, 15, 18), p.color(210, 40, 30), p.color(60, 90, 160)],
+                // 7: Terracotta & Sage
+                [p.color(195, 90, 60), p.color(225, 160, 115), p.color(110, 145, 125), p.color(245, 238, 225)],
+                // 8: Ukiyo-e Prussian
+                [p.color(25, 55, 105), p.color(65, 115, 160), p.color(235, 215, 180), p.color(215, 85, 65)],
+                // 9: Cyber Minimalist
+                [p.color(15, 23, 42), p.color(59, 130, 246), p.color(139, 92, 246), p.color(244, 63, 94), p.color(248, 250, 252)]
             ];
+
             let palette = palettes[p.floor(p.random(0, palettes.length))];
 
-            // STEP 1: RED - Background Aura & Gradient Field
-            if (maxStep >= 1) {
-                p.background(8, 8, 10);
+            // STEP 1: 백그라운드 색면 & 대기층 오라 (Rothko Style Base)
+            if (currentStep >= 1) {
                 p.noFill();
-                for (let r = w * 1.3; r > 0; r -= w * 0.03) {
+                for (let r = w * 1.4; r > 0; r -= w * 0.025) {
                     let c = p.random(palette);
-                    p.stroke(p.red(c), p.green(c), p.blue(c), 6);
-                    p.strokeWeight(w * 0.025);
+                    p.stroke(p.red(c), p.green(c), p.blue(c), 5);
+                    p.strokeWeight(w * 0.03);
                     p.circle(w / 2, h / 2, r);
+                }
+
+                // 큰 은은한 색면 반점 2~3개
+                p.noStroke();
+                for (let i = 0; i < 3; i++) {
+                    let c = p.random(palette);
+                    p.fill(p.red(c), p.green(c), p.blue(c), 25);
+                    p.rect(p.random(w * 0.1, w * 0.5), p.random(h * 0.1, h * 0.5), p.random(w * 0.3, w * 0.6), p.random(h * 0.3, h * 0.6), w * 0.04);
                 }
             }
 
-            // STEP 2: YELLOW - Geometry & Vector Flow Field
-            if (maxStep >= 2) {
+            // STEP 2~5: 거장 알고리즘 레이어 연산
+            if (currentStep >= 2) {
                 if (genre === 0) {
+                    // [장르 0: Rothko Layered Color Field]
                     p.noStroke();
-                    let count = p.floor(p.random(16, 28));
-                    for (let i = 0; i < count; i++) {
+                    let blocks = p.floor(p.map(Math.min(currentStep, 5), 2, 5, 2, 6));
+                    for (let i = 0; i < blocks; i++) {
                         let c = p.random(palette);
-                        p.fill(p.red(c), p.green(c), p.blue(c), p.random(130, 220));
-                        let sw = p.random(w * 0.08, w * 0.4);
-                        let sh = p.random(h * 0.08, h * 0.4);
-                        let sx = p.random(w * 0.08, w * 0.9 - sw);
-                        let sy = p.random(h * 0.08, h * 0.9 - sh);
-                        p.rect(sx, sy, sw, sh, p.random(0, w * 0.02));
+                        p.fill(p.red(c), p.green(c), p.blue(c), p.random(110, 190));
+                        let bw = p.random(w * 0.5, w * 0.85);
+                        let bh = p.random(h * 0.18, h * 0.38);
+                        let bx = (w - bw) / 2 + p.random(-w * 0.03, w * 0.03);
+                        let by = p.random(h * 0.08, h * 0.85 - bh);
+                        p.rect(bx, by, bw, bh, w * 0.01);
                     }
-                    p.stroke(255, 255, 255, 90);
-                    p.strokeWeight(w * 0.0015);
-                    p.line(w * 0.08, h * 0.5, w * 0.92, h * 0.5);
-                } else if (genre === 1) {
-                    p.noFill();
-                    p.strokeWeight(w * 0.0025);
-                    let lines = p.floor(p.random(350, 550));
-                    for (let i = 0; i < lines; i++) {
+                } 
+                else if (genre === 1) {
+                    // [장르 1: Kandinsky Dynamic Composition]
+                    let shapes = p.floor(p.map(Math.min(currentStep, 5), 2, 5, 8, 26));
+                    for (let i = 0; i < shapes; i++) {
                         let c = p.random(palette);
-                        p.stroke(p.red(c), p.green(c), p.blue(c), p.random(90, 190));
+                        let st = p.floor(p.random(4));
+                        p.fill(p.red(c), p.green(c), p.blue(c), p.random(120, 210));
+                        p.stroke(0, 0, 0, 120); p.strokeWeight(w * 0.0015);
+                        
+                        let sx = p.random(w * 0.1, w * 0.9);
+                        let sy = p.random(h * 0.1, h * 0.9);
+                        let sr = p.random(w * 0.04, w * 0.22);
+                        
+                        if (st === 0) p.circle(sx, sy, sr);
+                        else if (st === 1) p.rect(sx, sy, sr, sr * p.random(0.5, 2), w * 0.005);
+                        else if (st === 2) p.triangle(sx, sy, sx + sr, sy - sr, sx - sr*0.5, sy + sr);
+                        else {
+                            p.noFill(); p.stroke(p.random(palette)); p.strokeWeight(w * 0.004);
+                            p.arc(sx, sy, sr*1.5, sr*1.5, 0, p.PI * p.random(0.8, 1.8));
+                        }
+                    }
+                    // 역동적 사선 축
+                    p.stroke(255, 255, 255, 140); p.strokeWeight(w * 0.003);
+                    p.line(w * 0.1, h * 0.85, w * 0.9, h * 0.15);
+                } 
+                else if (genre === 2) {
+                    // [장르 2: Mondrian De Stijl Recursive Grid]
+                    p.stroke(18, 18, 22); p.strokeWeight(w * 0.012);
+                    let cols = p.floor(p.random(3, 6));
+                    let rows = p.floor(p.random(3, 6));
+                    let cellW = w / cols;
+                    let cellH = h / rows;
+                    for (let c = 0; c < cols; c++) {
+                        for (let r = 0; r < rows; r++) {
+                            if (p.random(1) > 0.45) {
+                                let col = p.random(palette);
+                                p.fill(col);
+                            } else {
+                                p.fill(245, 245, 240);
+                            }
+                            p.rect(c * cellW, r * cellH, cellW, cellH);
+                        }
+                    }
+                } 
+                else if (genre === 3) {
+                    // [장르 3: Richter Squeegee Smear]
+                    p.noStroke();
+                    let bands = p.floor(p.map(Math.min(currentStep, 5), 2, 5, 20, 80));
+                    for (let i = 0; i < bands; i++) {
+                        let c = p.random(palette);
+                        p.fill(p.red(c), p.green(c), p.blue(c), p.random(100, 200));
+                        let sy = p.random(h);
+                        let sh = p.random(h * 0.01, h * 0.08);
+                        p.rect(0, sy, w, sh);
+                        // 스퀴지 끌림 수직 노이즈
+                        if (p.random(1) > 0.5) {
+                            p.fill(255, 255, 255, random(30, 80));
+                            p.rect(p.random(w), sy, p.random(w * 0.05, w * 0.2), sh * p.random(2, 5));
+                        }
+                    }
+                } 
+                else if (genre === 4) {
+                    // [장르 4: Pollock Action Painting Drips & Splatter]
+                    p.noFill();
+                    let drips = p.floor(p.map(Math.min(currentStep, 5), 2, 5, 40, 180));
+                    for (let i = 0; i < drips; i++) {
+                        let c = p.random(palette);
+                        p.stroke(p.red(c), p.green(c), p.blue(c), p.random(120, 220));
+                        p.strokeWeight(p.random(w * 0.001, w * 0.008));
                         p.beginShape();
                         let x = p.random(w), y = p.random(h);
-                        for (let j = 0; j < 20; j++) {
+                        for (let j = 0; j < 8; j++) {
+                            p.curveVertex(x, y);
+                            x += p.random(-w * 0.15, w * 0.15);
+                            y += p.random(-h * 0.15, h * 0.15);
+                        }
+                        p.endShape();
+                        
+                        // 물감 방울 비산 (Splatter)
+                        if (p.random(1) > 0.4) {
+                            p.noStroke(); p.fill(p.red(c), p.green(c), p.blue(c), p.random(150, 240));
+                            p.circle(x, y, p.random(w * 0.004, w * 0.02));
+                        }
+                    }
+                } 
+                else if (genre === 5) {
+                    // [장르 5: Op Art Moiré Wave Distortion]
+                    p.noFill(); p.strokeWeight(w * 0.002);
+                    let lines = p.floor(p.map(Math.min(currentStep, 5), 2, 5, 40, 120));
+                    for (let i = 0; i < lines; i++) {
+                        let c = p.random(palette);
+                        p.stroke(p.red(c), p.green(c), p.blue(c), p.random(140, 230));
+                        p.beginShape();
+                        for (let x = 0; x <= w; x += w * 0.02) {
+                            let angle = (x * 0.015) + (i * 0.1);
+                            let y = (i * (h / lines)) + p.sin(angle) * (h * 0.05);
                             p.vertex(x, y);
-                            let angle = p.noise(x * 0.005, y * 0.005) * p.TWO_PI * 4;
-                            x += p.cos(angle) * (w * 0.015);
-                            y += p.sin(angle) * (h * 0.015);
                         }
                         p.endShape();
                     }
-                } else if (genre === 2) {
-                    for (let i = 0; i < 200; i++) {
-                        let c = p.random(palette);
-                        p.stroke(p.red(c), p.green(c), p.blue(c), p.random(110, 230));
-                        p.strokeWeight(p.random(w * 0.002, w * 0.006));
-                        let x = p.random(w), y = p.random(h);
-                        let len = p.random(w * 0.05, w * 0.35);
-                        p.line(x, y, x + len, y);
-                    }
-                } else {
+                } 
+                else if (genre === 6) {
+                    // [장르 6: Suprematism Malevich Tilts]
                     p.noStroke();
-                    for (let i = 0; i < 18; i++) {
+                    let polys = p.floor(p.map(Math.min(currentStep, 5), 2, 5, 5, 18));
+                    for (let i = 0; i < polys; i++) {
                         let c = p.random(palette);
-                        p.fill(p.red(c), p.green(c), p.blue(c), p.random(30, 90));
-                        p.circle(p.random(w), p.random(h), p.random(w * 0.2, w * 0.65));
+                        p.fill(p.red(c), p.green(c), p.blue(c), p.random(140, 230));
+                        p.push();
+                        p.translate(p.random(w * 0.15, w * 0.85), p.random(h * 0.15, h * 0.85));
+                        p.rotate(p.random(-p.QUARTER_PI, p.QUARTER_PI));
+                        p.rect(0, 0, p.random(w * 0.08, w * 0.4), p.random(h * 0.04, h * 0.25));
+                        p.pop();
+                    }
+                } 
+                else {
+                    // [장르 7: Zaha Hadid Parametric Curves]
+                    p.noFill(); p.strokeWeight(w * 0.002);
+                    let ribbons = p.floor(p.map(Math.min(currentStep, 5), 2, 5, 30, 110));
+                    for (let i = 0; i < ribbons; i++) {
+                        let c = p.random(palette);
+                        p.stroke(p.red(c), p.green(c), p.blue(c), p.random(100, 200));
+                        p.beginShape();
+                        let x = random(w), y = random(h);
+                        for (let j = 0; j < 15; j++) {
+                            p.vertex(x, y);
+                            let angle = p.noise(x * 0.003, y * 0.003) * p.TWO_PI * 6;
+                            x += p.cos(angle) * (w * 0.02);
+                            y += p.sin(angle) * (h * 0.02);
+                        }
+                        p.endShape();
                     }
                 }
             }
 
-            // STEP 3: GREEN - Texture, Film Grain & Signature Stamp
-            if (maxStep >= 3) {
+            // STEP 6: 캔버스 실사 질감 오버레이 & 필름 그레인
+            if (currentStep >= 6) {
                 p.loadPixels();
                 for (let i = 0; i < p.pixels.length; i += 4) {
-                    let grain = (p.random(-1, 1) * 14);
+                    let grain = (p.random(-1, 1) * 15);
                     p.pixels[i] = p.constrain(p.pixels[i] + grain, 0, 255);
                     p.pixels[i+1] = p.constrain(p.pixels[i+1] + grain, 0, 255);
                     p.pixels[i+2] = p.constrain(p.pixels[i+2] + grain, 0, 255);
                 }
                 p.updatePixels();
 
+                // STEP 7: 우측 하단 아티스트 시그니처 각인
                 p.push();
                 let tag = `${(author || 'ANONYMOUS').toUpperCase()} // ED. #${seed.toString(16).toUpperCase().slice(-5)}`;
                 p.textAlign(p.RIGHT, p.BOTTOM);
@@ -262,7 +420,7 @@
                 p.textSize(p.max(8.5, w * 0.022));
                 
                 p.noStroke();
-                p.fill(8, 8, 10, 210);
+                p.fill(6, 6, 8, 220);
                 let tw = p.textWidth(tag);
                 p.rect(w - tw - (w * 0.05), h - (h * 0.07), tw + (w * 0.025), h * 0.045, 2);
                 
@@ -272,28 +430,21 @@
             }
         },
         render: function(p, seed, genre, author) {
-            this.renderStep(p, seed, genre, author, 3);
+            this.renderStep(p, seed, genre, author, 7, 7);
         }
     };
 
-    const vocabulary = {
-        red_1: [
-            ["Analyzing structural resonance of '{N}'.", "Scanning semantic profile for '{N}'."],
-            ["Setting foundational color space to deep matte tones.", "Establishing dark crimson contrast base."]
-        ],
-        yellow_1: [
-            ["Received Red's color space. Initiating spatial partition.", "Acknowledged. Constructing geometric tension."],
-            ["Applying golden ratio grid system.", "Injecting vector flow field calculations."]
-        ],
-        green_1: [
-            ["Integrating luminous texture layers.", "Adjusting airiness and spectral opacity."],
-            ["Applying film grain pass and texture synthesis.", "Artwork synthesis complete. Registered signature label."]
-        ]
-    };
-
-    function pseudoSelect(arr, seed) {
-        let idx = Math.floor((Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000)) * arr.length);
-        return arr[idx];
+    /* 7단계 깊이 있는 AI 큐레이팅 대화 모듈 */
+    function generate7StepDialogue(author, seed) {
+        return [
+            { agent: 'agent-red', name: 'RED // 01', text: `Initiating semantic spectral scan for '${author}'. Primary color field aura forming.` },
+            { agent: 'agent-yellow', name: 'YELLOW // 02', text: `Acknowledged Red. Deconstructing spatial proportions and structural grid axes.` },
+            { agent: 'agent-green', name: 'GREEN // 03', text: `Evaluating tonal equilibrium. Introducing high-opacity gradient layers.` },
+            { agent: 'agent-red', name: 'RED // 01', text: `Proposing contrast escalation inspired by modernist masterworks.` },
+            { agent: 'agent-yellow', name: 'YELLOW // 02', text: `Intersecting parametric noise vectors. Primary composition stabilized.` },
+            { agent: 'agent-red', name: 'RED // 01', text: `Visual tension balanced. Harmony established between structure and fluid motion.` },
+            { agent: 'agent-green', name: 'GREEN // 03', text: `Canvas texture & film grain pass complete. Stamped signature ED. #${seed.toString(16).slice(-5)}.` }
+        ];
     }
 
     document.getElementById('startBtn').addEventListener('click', () => {
@@ -301,39 +452,45 @@
         if (!nameInput) return alert("Please enter an artist name.");
         userNameVal = nameInput;
 
+        startSynthesisPipeline(userNameVal, null);
+    });
+
+    function startSynthesisPipeline(author, customSeed) {
         const chatBox = document.getElementById('chatBox');
         chatBox.innerHTML = '';
         document.getElementById('actionBtns').style.display = 'none';
 
-        let hash = 0;
-        for (let i = 0; i < userNameVal.length; i++) hash = userNameVal.charCodeAt(i) + ((hash << 5) - hash);
-        currentSeed = Math.abs(hash) + Date.now();
-        artGenre = Math.floor((currentSeed % 100) / 25) % 4;
+        if (customSeed) {
+            currentSeed = customSeed;
+        } else {
+            let hash = 0;
+            for (let i = 0; i < author.length; i++) hash = author.charCodeAt(i) + ((hash << 5) - hash);
+            currentSeed = Math.abs(hash) + Date.now();
+        }
 
-        currentDialogue = [
-            { agent: 'agent-red', name: 'RED // 01', text: `${pseudoSelect(vocabulary.red_1[0], currentSeed).replace('{N}', userNameVal)} ${pseudoSelect(vocabulary.red_1[1], currentSeed + 1)}` },
-            { agent: 'agent-yellow', name: 'YELLOW // 02', text: `${pseudoSelect(vocabulary.yellow_1[0], currentSeed + 2)} ${pseudoSelect(vocabulary.yellow_1[1], currentSeed + 3)}` },
-            { agent: 'agent-green', name: 'GREEN // 03', text: `${pseudoSelect(vocabulary.green_1[0], currentSeed + 4)} ${pseudoSelect(vocabulary.green_1[1], currentSeed + 5).replace('{N}', userNameVal)}` }
-        ];
+        artGenre = Math.floor((currentSeed % 100) / 12.5) % 8; // 8가지 장르 선택
+        currentDialogue = generate7StepDialogue(author, currentSeed);
 
-        // 캔버스 초기화
+        soundEngine.start();
         initStudioCanvas();
 
         let step = 0;
+        const totalSteps = currentDialogue.length;
         const interval = setInterval(() => {
-            if (step < currentDialogue.length) {
+            if (step < totalSteps) {
                 appendChat(currentDialogue[step].agent, currentDialogue[step].name, currentDialogue[step].text);
-                // 실시간 순차 드로잉 렌더링 호출
+                soundEngine.updatePitch(step + 1);
                 if (p5Instance) {
-                    p5Instance.drawStep(step + 1);
+                    p5Instance.drawStep(step + 1, totalSteps);
                 }
                 step++;
             } else {
                 clearInterval(interval);
+                soundEngine.stop();
                 document.getElementById('actionBtns').style.display = 'flex';
             }
-        }, 1000);
-    });
+        }, 850);
+    }
 
     function appendChat(className, aiName, text) {
         const chatBox = document.getElementById('chatBox');
@@ -348,17 +505,15 @@
         if (p5Instance) p5Instance.remove();
 
         const sketch = (p) => {
-            let currentDrawingStep = 0;
             p.setup = () => {
                 let size = p.min(p.windowWidth * 0.5, 520);
                 if (p.windowWidth <= 868) size = p.min(p.windowWidth - 60, 420);
                 p.createCanvas(size, size);
-                p.background(8, 8, 10);
+                p.background(6, 6, 8);
                 p.noLoop();
             };
-            p.drawStep = (step) => {
-                currentDrawingStep = step;
-                ArtEngine.renderStep(p, currentSeed, artGenre, userNameVal, currentDrawingStep);
+            p.drawStep = (step, total) => {
+                ArtEngine.renderStep(p, currentSeed, artGenre, userNameVal, step, total);
             };
         };
 
@@ -367,20 +522,28 @@
         p5Instance = new p5(sketch, container);
     }
 
-    /* 4K 고해상도 백그라운드 내보내기 함수 */
+    /* 4K 고해상도 백그라운드 내보내기 */
     function export4KCanvas() {
         const offscreenSketch = (p) => {
             p.setup = () => {
                 p.createCanvas(2400, 2400);
                 ArtEngine.render(p, currentSeed, artGenre, userNameVal);
-                p.saveCanvas(`art_4K_${userNameVal}`, 'jpg');
+                p.saveCanvas(`masterpiece_4K_${userNameVal}`, 'jpg');
                 p.remove();
             };
         };
         new p5(offscreenSketch);
     }
 
-    /* 전시 및 비평 대화 Firestore 저장 */
+    /* 고유 딥링크(Permalink) 공유 */
+    function sharePermalink() {
+        const link = `${window.location.origin}${window.location.pathname}?author=${encodeURIComponent(userNameVal)}&seed=${currentSeed}`;
+        navigator.clipboard.writeText(link).then(() => {
+            alert("Permalink URL copied to clipboard!");
+        });
+    }
+
+    /* 박물관 게시 */
     async function saveToMuseum() {
         const password = prompt("Set a deletion password (4+ digits) for this artwork:");
         if (password === null) return;
@@ -394,6 +557,7 @@
                 password: password.trim(),
                 seed: currentSeed,
                 genre: artGenre,
+                curateCount: 0,
                 dialogue: currentDialogue,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -403,6 +567,19 @@
             alert("Error publishing artwork: " + e.message);
         }
     }
+
+    /* 딥링크 접속 감지 처리 */
+    window.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlAuthor = urlParams.get('author');
+        const urlSeed = urlParams.get('seed');
+
+        if (urlAuthor && urlSeed) {
+            document.getElementById('userName').value = urlAuthor;
+            userNameVal = urlAuthor;
+            startSynthesisPipeline(urlAuthor, parseInt(urlSeed));
+        }
+    });
 </script>
 </body>
 </html>
