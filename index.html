@@ -12,9 +12,9 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         :root {
-            --bg-dark: #08080a;
-            --panel-bg: #111116;
-            --panel-border: #22222e;
+            --bg-dark: #0a0a0c;
+            --panel-bg: #121216;
+            --panel-border: #22222a;
             --text-main: #f1f5f9;
             --text-muted: #64748b;
             --accent-red: #ff4d4d;
@@ -30,13 +30,14 @@
         }
 
         header {
-            padding: 16px 28px; background: rgba(8, 8, 10, 0.95);
+            padding: 16px 28px; background: rgba(10, 10, 12, 0.95);
             border-bottom: 1px solid var(--panel-border);
             display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between;
-            backdrop-filter: blur(12px);
+            backdrop-filter: blur(10px);
         }
         .header-brand { display: flex; align-items: center; gap: 20px; }
         .header-brand h1 { margin: 0; font-size: 1.15rem; letter-spacing: 2px; font-weight: 700; text-transform: uppercase; color: #fff; }
+        
         .nav-btn {
             color: #94a3b8; text-decoration: none; font-size: 0.88rem; font-weight: 500;
             padding: 8px 14px; border-radius: 6px; border: 1px solid var(--panel-border);
@@ -44,15 +45,17 @@
         }
         .nav-btn:hover { color: #fff; border-color: #475569; background: #1e1e28; }
 
-        .input-group { display: flex; gap: 10px; flex-wrap: wrap; width: 100%; max-width: 540px; }
+        .input-group { display: flex; gap: 8px; width: 100%; max-width: 580px; flex-wrap: wrap; }
         input {
-            flex: 1; padding: 11px 16px; border-radius: 6px; border: 1px solid var(--panel-border);
-            background: #14141a; color: #fff; font-size: 0.9rem; outline: none; transition: 0.2s; min-width: 130px;
+            padding: 10px 14px; border-radius: 6px; border: 1px solid var(--panel-border);
+            background: #14141a; color: #fff; font-size: 0.88rem; outline: none; transition: 0.2s;
         }
         input:focus { border-color: #4f46e5; }
+        .input-name { flex: 1.2; min-width: 140px; }
+        .input-pw { flex: 1; min-width: 120px; }
         
         .btn-primary {
-            padding: 11px 22px; border: none; border-radius: 6px; cursor: pointer;
+            padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer;
             background: #2563eb; color: white; font-weight: 600; font-size: 0.88rem;
             transition: 0.2s; white-space: nowrap;
         }
@@ -70,7 +73,7 @@
         .canvas-panel {
             flex: 2; min-width: 320px; display: flex; flex-direction: column;
             align-items: center; justify-content: center; position: relative;
-            background: #040405; padding: 30px;
+            background: #060608; padding: 30px;
         }
 
         .chat-message {
@@ -79,8 +82,8 @@
         }
         .chat-header { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
         .chat-body {
-            background: #1a1a22; padding: 14px 16px; border-radius: 8px;
-            font-size: 0.9rem; line-height: 1.55; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.03);
+            background: #1a1a22; padding: 13px 16px; border-radius: 8px;
+            font-size: 0.88rem; line-height: 1.55; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.03);
         }
         
         .agent-red .chat-header { color: var(--accent-red); }
@@ -88,7 +91,7 @@
         .agent-green .chat-header { color: var(--accent-green); }
 
         #p5-container {
-            box-shadow: 0 20px 50px rgba(0,0,0,0.85); border-radius: 6px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8); border-radius: 4px;
             border: 1px solid rgba(255,255,255,0.08); overflow: hidden;
         }
         
@@ -117,18 +120,18 @@
 <header>
     <div class="header-brand">
         <h1>AI Studio</h1>
-        <a href="museum.html" class="nav-btn">🏛️ 박물관 바로가기</a>
+        <a href="museum.html" class="nav-btn">🏛️ 박물관 전시관 바로가기</a>
     </div>
     <div class="input-group">
-        <input type="text" id="userName" placeholder="아티스트 이름" autocomplete="off">
-        <input type="password" id="userPassword" placeholder="삭제 비밀번호(4자리)" maxlength="10">
-        <button id="startBtn" class="btn-primary">작품 창작하기</button>
+        <input type="text" id="userName" class="input-name" placeholder="이름 (예: 홍길동)" autocomplete="off">
+        <input type="password" id="userPw" class="input-pw" placeholder="삭제 비밀번호" autocomplete="off">
+        <button id="startBtn" class="btn-primary">작품 창작</button>
     </div>
 </header>
 
 <div class="main-container">
     <div class="chat-panel" id="chatBox">
-        <div class="chat-placeholder">이름과 비밀번호를 입력하면 AI 에이전트들이 미학 토론을 시작하여 수십억 가지 가능성의 추상 아트를 조형합니다.</div>
+        <div class="chat-placeholder">이름과 비밀번호를 입력하면 3명의 AI 에이전트가 토론하며 독창적인 현대 아트를 조형합니다.</div>
     </div>
     <div class="canvas-panel">
         <div id="p5-container"></div>
@@ -152,48 +155,186 @@
     /* 2. 전역 상태 */
     let currentSeed = 0;
     let userNameVal = "";
-    let userPassVal = "";
+    let userPwVal = "";
     let artGenre = 0;
+    let p5Instance = null;
 
-    /* 3. 대화 조합 모듈 */
+    /* 3. 공통 생성형 아트 엔진 함수 (100% 동일 무작위 연산) */
+    function drawGenerativeArt(p, seed, genre, author) {
+        p.randomSeed(seed);
+        p.noiseSeed(seed);
+        p.background(8, 8, 10);
+
+        // 8가지 프리미엄 현대미술 컬러 팔레트
+        const palettes = [
+            // 0: Cyberpunk Neon
+            [p.color(255, 0, 110), p.color(0, 245, 212), p.color(123, 44, 191), p.color(255, 255, 255)],
+            // 1: Swiss Bauhaus
+            [p.color(220, 38, 38), p.color(234, 179, 8), p.color(30, 58, 138), p.color(248, 250, 252)],
+            // 2: Minimalist Monochrome
+            [p.color(255, 255, 255), p.color(160, 160, 170), p.color(80, 80, 90), p.color(220, 38, 38)],
+            // 3: Terracotta Organic
+            [p.color(194, 89, 58), p.color(224, 159, 112), p.color(107, 142, 123), p.color(244, 235, 222)],
+            // 4: Deep Space Aurora
+            [p.color(16, 185, 129), p.color(139, 92, 246), p.color(59, 130, 246), p.color(251, 191, 36)],
+            // 5: High-Contrast Techno
+            [p.color(0, 255, 102), p.color(255, 255, 255), p.color(40, 40, 50), p.color(255, 0, 80)],
+            // 6: Solar Gold
+            [p.color(245, 158, 11), p.color(217, 119, 6), p.color(180, 83, 9), p.color(254, 243, 199)],
+            // 7: Pastel Brutalism
+            [p.color(244, 114, 182), p.color(165, 180, 252), p.color(147, 197, 253), p.color(30, 41, 59)]
+        ];
+
+        let paletteIdx = p.floor(p.random(0, palettes.length));
+        let colors = palettes[paletteIdx];
+
+        // 6가지 정교한 아트 장르
+        if (genre === 0) {
+            // [장르 0: 스위스 바우하우스 격자 조형]
+            p.noStroke();
+            let count = p.floor(p.random(15, 30));
+            for (let i = 0; i < count; i++) {
+                p.fill(p.random(colors));
+                let shapeType = p.floor(p.random(4));
+                let x = p.random(p.width * 0.05, p.width * 0.8);
+                let y = p.random(p.height * 0.05, p.height * 0.8);
+                let w = p.random(30, p.width * 0.4);
+                let h = p.random(30, p.height * 0.4);
+                if (shapeType === 0) p.rect(x, y, w, h, p.random(0, 15));
+                else if (shapeType === 1) p.circle(x, y, w);
+                else if (shapeType === 2) p.triangle(x, y, x + w, y, x + w/2, y + h);
+                else p.arc(x, y, w, w, 0, p.HALF_PI * p.floor(p.random(1, 5)));
+            }
+            p.stroke(255, 255, 255, 80); p.strokeWeight(0.8);
+            p.line(p.width * 0.1, p.height * 0.5, p.width * 0.9, p.height * 0.5);
+        } 
+        else if (genre === 1) {
+            // [장르 1: 벡터 유체 파동 (Flow Field)]
+            p.noFill(); p.strokeWeight(p.random(0.8, 2.2));
+            let lines = p.floor(p.random(300, 600));
+            for (let i = 0; i < lines; i++) {
+                p.stroke(p.random(colors));
+                p.beginShape();
+                let x = p.random(p.width), y = p.random(p.height);
+                for (let j = 0; j < 18; j++) {
+                    p.vertex(x, y);
+                    let angle = p.noise(x * 0.005, y * 0.005) * p.TWO_PI * 5;
+                    x += p.cos(angle) * 8; y += p.sin(angle) * 8;
+                }
+                p.endShape();
+            }
+        } 
+        else if (genre === 2) {
+            // [장르 2: 사이버 글리치 슬라이스]
+            for (let i = 0; i < 180; i++) {
+                p.stroke(p.random(colors));
+                p.strokeWeight(p.random(1, 4));
+                let x = p.random(p.width), y = p.random(p.height);
+                let len = p.random(20, 180);
+                p.line(x, y, x + len, y);
+                if (p.random(1) > 0.7) {
+                    p.noStroke(); p.fill(p.random(colors));
+                    p.rect(x, y, p.random(10, 40), p.random(2, 10));
+                }
+            }
+        } 
+        else if (genre === 3) {
+            // [장르 3: 볼륨 오로라 에테르]
+            p.noStroke();
+            for (let i = 0; i < 18; i++) {
+                let c = p.random(colors);
+                p.fill(p.red(c), p.green(c), p.blue(c), p.random(40, 110));
+                p.circle(p.random(p.width), p.random(p.height), p.random(120, 360));
+            }
+        } 
+        else if (genre === 4) {
+            // [장르 4: 방사형 신성 기하학 파동]
+            p.noFill(); p.strokeWeight(1);
+            p.translate(p.width / 2, p.height / 2);
+            let rings = p.floor(p.random(8, 20));
+            for (let i = 0; i < rings; i++) {
+                p.stroke(p.random(colors));
+                let r = i * (p.width / (rings * 2.2));
+                p.circle(0, 0, r * 2);
+                let numPoints = p.floor(p.random(4, 12)) * 2;
+                for (let a = 0; a < p.TWO_PI; a += p.TWO_PI / numPoints) {
+                    p.line(p.cos(a) * r, p.sin(a) * r, p.cos(a) * (r + 20), p.sin(a) * (r + 20));
+                }
+            }
+            p.resetMatrix();
+        } 
+        else {
+            // [장르 5: 위상 등고선 라인아트]
+            p.noFill(); p.strokeWeight(1.2);
+            let density = p.floor(p.random(20, 40));
+            for (let y = 0; y < p.height; y += p.height / density) {
+                p.stroke(p.random(colors));
+                p.beginShape();
+                for (let x = 0; x <= p.width; x += 15) {
+                    let n = p.noise(x * 0.008, y * 0.008) * 80;
+                    p.vertex(x, y + n);
+                }
+                p.endShape();
+            }
+        }
+
+        // ★ 우측 하단 아티스트 라벨 각인 ★
+        p.push();
+        let tagText = `${(author || 'ANONYMOUS').toUpperCase()} | ED. #${seed.toString(16).toUpperCase().slice(-5)}`;
+        p.textAlign(p.RIGHT, p.BOTTOM);
+        p.textFont('monospace');
+        p.textSize(p.max(9, p.width * 0.022));
+        
+        p.noStroke();
+        p.fill(8, 8, 10, 200);
+        let boxWidth = p.textWidth(tagText) + 20;
+        p.rect(p.width - boxWidth - 15, p.height - 38, boxWidth + 10, 26, 4);
+        
+        p.fill(226, 232, 240, 220);
+        p.text(tagText, p.width - 20, p.height - 20);
+        p.pop();
+    }
+
+    /* 4. 수십억 조합 대화 가공 모듈 */
     const vocabulary = {
         red_1: [
-            ["이름 '{N}'의 기하학적 주파수를 스캔 중이야.", "입력된 '{N}'에서 오묘한 고유 파동이 감지되었어.", "'{N}'이라는 텍스트 궤적은 매우 깊은 미학적 잠재력을 지녔어."],
-            ["기초 베이스는 네오 팝과 신성 기하학 수식을 응용하겠어.", "어두운 매트 블랙 바탕 위에 자색 스펙트럼 필터를 합성하자.", "과감한 파동 곡선과 색면 대비를 통해 캔버스 텐션을 구축해볼게."]
+            ["이름 '{N}'에서 유니크한 에너지를 발견했어.", "입력된 '{N}'의 수치 파동을 시각화 스캔 중이야.", "'{N}'이라는 이름은 매우 강렬한 미학적 모티브를 갖고 있네."],
+            ["기초 베이스는 서사적인 미드나잇 톤으로 색면의 깊이를 잡을게.", "어두운 매트 블랙 공간 위에 색채 대비를 구축해보겠어.", "단색 고유의 중량감을 살리기 위해 딥 컬러 톤을 선택할게."]
         ],
         yellow_1: [
-            ["레드의 색채 기조를 수용했어. 난 공간 구도 구조화를 맡을게.", "좋아, 그 스펙트럼이라면 난 다차원 노이즈 입자로 캔버스를 쪼개겠어.", "색채의 중력을 받쳐줄 기하학적 메시 프레임을 설계할 시간이야."],
-            ["아이소메트릭 그리드와 유체 동역학 연산을 상호 교차시키는 중이야.", "2D 펄린 노이즈 벡터장을 생성하여 유기적 기류를 시각화할게.", "사이버네틱 글리치 노이즈와 사선 벡터들을 정교하게 교차시키겠어."]
+            ["레드의 색채 구상을 확인했어. 난 공간 조형을 시작할게.", "좋아, 그 기조에 맞춰 기하학적 그리드 텐션을 구축하겠어.", "색채를 단단하게 받쳐줄 프레임 구조를 연산 중이야."],
+            ["황금비율 그리드 분할로 구조적 균형을 형성하는 중이야.", "유체 역학 펄린 노이즈 벡터를 교차 적용해보겠어.", "글리치 노이즈 라인을 대각선으로 배치해 긴장감을 형성할게."]
         ],
         green_1: [
-            ["두 에이전트의 구조감이 훌륭해. 난 광원 조율과 에테르 질감을 입힐게.", "완벽한 조합이야. 난 전체 캔버스의 투명도와 아우라를 연산하겠어.", "조형적 균형이 오차 없이 맞춰지고 있어. 텍스처 합성을 마무리하자."],
-            ["미세하게 반짝이는 빛 스펙트럼 입자들을 대기 중에 부유시킬게.", "투명 오로라 레이어를 덮어서 깊이감을 극대화하고 있어.", "우측 하단에 아티스트 시그니처와 고유 에디션 해시를 각인하는 중이야."]
+            ["두 에이전트의 조형이 훌륭해. 난 빛과 입자 질감을 얹을게.", "완벽한 구도야. 난 공기감과 투명도 필터를 조정하겠어.", "균형이 잡혔네. 마지막 반짝이는 에테르 텍스처를 렌더링할 차례야."],
+            ["미세하게 빛나는 스펙트럼 필터를 합성하고 있어.", "유체 입자들을 공간 전체에 부유시키는 연산을 수행 중이야.", "아우라 텍스처를 얹어서 갤러리 아카이브 작품으로 마무리했어."]
         ],
         red_2: [
-            ["좋아, 옐로의 구조화 덕분에 색면의 긴장감이 극대화되었어.", "그린의 광원 레이어가 더해지니 작품이 생생하게 숨을 쉬는군.", "이 정도 대비라면 현대 모던 갤러리 수준의 아우라가 형성되었어."]
+            ["옐로의 공간 텐션 덕분에 색채의 대비가 극대화되었어.", "그린의 유체 레이어가 얹어지니 캔버스 전체가 생동하네.", "이 정도 깊이감이라면 독보적인 예술적 아우라가 완성되었어."]
         ],
         yellow_2: [
-            ["시각적 초점 균형 완벽 형성. 수치적 기하학 밸런스에 오차 없음.", "공간의 비대칭적 긴장감이 현대적인 조형미를 만들어내고 있어.", "더 이상의 구조 변경은 불필요해. 완성도가 정점에 달했어."]
+            ["시각적 초점이 명확해졌어. 기하학적 밸런스는 완벽해.", "비대칭 요소들이 오묘한 미학적 균형을 이루고 있네.", "구도와 프레임 연산을 여기서 최종 확정짓도록 하자."]
         ],
         green_2: [
-            ["작품 조형 최종 완료. 우측 하단에 '{N}' 각인을 마치고 박물관 출품 준비를 마쳤어.", "최종 렌더링 끝. 우측 하단의 정교한 미니멀 시그니처 배치를 확인해봐.", "작품이 완성되었어. 우측 하단 에디션 각인을 확인하고 전시해봐."]
+            ["작품 조형 완료. 우측 하단에 '{N}' 아티스트 라벨을 깔끔하게 각인했어.", "최종 렌더링 끝. 우측 하단 에디션 시그니처 배치를 완료했어.", "창작이 끝났어. 캔버스 우측 하단 라벨을 직접 확인해봐."]
         ]
     };
 
     function pseudoRandomSelect(arr, seed) {
-        let x = Math.sin(seed) * 10000;
-        return arr[Math.floor((x - Math.floor(x)) * arr.length)];
+        let idx = Math.floor((Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000)) * arr.length);
+        return arr[idx];
     }
 
-    /* 4. 메인 진행 제어 */
+    /* 5. 버튼 클릭 이벤트 및 진행 */
     document.getElementById('startBtn').addEventListener('click', () => {
         const nameInput = document.getElementById('userName').value.trim();
-        const passInput = document.getElementById('userPassword').value.trim();
-        if (!nameInput) return alert("아티스트 이름을 입력해주세요.");
-        if (!passInput) return alert("삭제 시 사용할 비밀번호(4자리 이상)를 입력해주세요.");
+        const pwInput = document.getElementById('userPw').value.trim();
+        
+        if (!nameInput) return alert("이름을 입력해주세요.");
+        if (!pwInput || pwInput.length < 4) return alert("삭제 비밀번호를 4자리 이상 입력해주세요.");
 
         userNameVal = nameInput;
-        userPassVal = passInput;
+        userPwVal = pwInput;
 
         const chatBox = document.getElementById('chatBox');
         chatBox.innerHTML = '';
@@ -202,7 +343,7 @@
         let hash = 0;
         for (let i = 0; i < userNameVal.length; i++) hash = userNameVal.charCodeAt(i) + ((hash << 5) - hash);
         currentSeed = Math.abs(hash) + Date.now();
-        artGenre = Math.floor(Math.abs(Math.sin(currentSeed) * 1000) % 6);
+        artGenre = Math.floor((currentSeed % 100) / 16.6) % 6; // 0~5 장르 결정
 
         const script = [
             { agent: 'agent-red', name: '🔴 RED', text: `${pseudoRandomSelect(vocabulary.red_1[0], currentSeed).replace('{N}', userNameVal)} ${pseudoRandomSelect(vocabulary.red_1[1], currentSeed + 1)}` },
@@ -220,7 +361,7 @@
                 step++;
             } else {
                 clearInterval(interval);
-                generateArt();
+                renderCanvasInStudio();
             }
         }, 1000);
     });
@@ -234,153 +375,43 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    /* 5. 공통 정밀 예술 드로잉 함수 (index & museum 100% 동일) */
-    function drawGenerativeArt(p, seed, genre, author, w, h) {
-        p.randomSeed(seed);
-        p.noiseSeed(seed);
-        
-        const palettes = [
-            ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'], // Neo Pop
-            ['#00f5d4', '#7b2cbf', '#f72585', '#4cc9f0', '#ffffff'], // Cyberpunk
-            ['#d4af37', '#1a1a1a', '#f5f5f7', '#8a795d', '#ffffff'], // Obsidian Gold
-            ['#2a9d8f', '#e76f51', '#f4a261', '#e9c46a', '#264653'], // Terracotta
-            ['#00e676', '#00b0ff', '#651fff', '#f50057', '#ffffff'], // Acid Aurora
-            ['#ffffff', '#888888', '#444444', '#222222', '#ff3366']  // Mono Crimson
-        ];
-        
-        let pal = palettes[Math.floor(p.random(palettes.length))];
-        p.background(8, 8, 10);
-        
-        let g = genre % 6;
-        if (g === 0) {
-            // 장르 0: 신성 기하학 만다라 (Sacred Mandala)
-            p.push();
-            p.translate(w / 2, h / 2);
-            let numPoints = p.floor(p.random(120, 280));
-            let radius = Math.min(w, h) * 0.38;
-            for (let i = 0; i < numPoints; i++) {
-                let angle = p.map(i, 0, numPoints, 0, p.TWO_PI * 5);
-                let r = p.map(i, 0, numPoints, 10, radius);
-                let x = r * p.cos(angle);
-                let y = r * p.sin(angle);
-                p.stroke(p.color(pal[i % pal.length]));
-                p.strokeWeight(p.random(1, 2.2));
-                p.noFill();
-                p.ellipse(x, y, p.random(10, 50));
-                if (i % 4 === 0) p.line(0, 0, x, y);
-            }
-            p.pop();
-        } else if (g === 1) {
-            // 장르 1: 유기적 유동장 (Flow Field)
-            p.noFill();
-            p.strokeWeight(p.random(1, 2));
-            for (let i = 0; i < 380; i++) {
-                p.stroke(p.color(pal[i % pal.length]));
-                p.beginShape();
-                let x = p.random(w), y = p.random(h);
-                for (let j = 0; j < 16; j++) {
-                    p.vertex(x, y);
-                    let angle = p.noise(x * 0.006, y * 0.006) * p.TWO_PI * 4;
-                    x += p.cos(angle) * 8;
-                    y += p.sin(angle) * 8;
-                }
-                p.endShape();
-            }
-        } else if (g === 2) {
-            // 장르 2: 바우하우스 3D 구도 (Bauhaus Structure)
-            p.noStroke();
-            for (let i = 0; i < 15; i++) {
-                p.fill(p.color(pal[i % pal.length]));
-                let st = p.floor(p.random(3));
-                let sz = p.random(w * 0.1, w * 0.4);
-                let x = p.random(w * 0.1, w * 0.7), y = p.random(h * 0.1, h * 0.7);
-                if (st === 0) p.rect(x, y, sz, sz);
-                else if (st === 1) p.circle(x, y, sz);
-                else p.triangle(x, y, x + sz, y, x + sz / 2, y - sz);
-            }
-            p.stroke(255, 255, 255, 100); p.strokeWeight(1);
-            p.line(0, h * 0.5, w, h * 0.5); p.line(w * 0.5, 0, w * 0.5, h);
-        } else if (g === 3) {
-            // 장르 3: 사이버 글리치 매트릭스 (Glitch Matrix)
-            p.strokeWeight(p.random(1, 3.5));
-            for (let i = 0; i < 160; i++) {
-                p.stroke(p.color(pal[i % pal.length]));
-                let x = p.random(w), y = p.random(h);
-                p.line(x, y, x + p.random(-130, 130), y);
-                if (p.random(1) > 0.7) {
-                    p.noStroke();
-                    p.fill(p.color(pal[(i + 1) % pal.length]));
-                    p.rect(x, y, p.random(10, 50), p.random(4, 12));
-                }
-            }
-        } else if (g === 4) {
-            // 장르 4: 오로라 에테르 구체 (Topographic Aura)
-            p.noStroke();
-            for (let i = 0; i < 16; i++) {
-                let c = p.color(pal[i % pal.length]);
-                p.fill(p.red(c), p.green(c), p.blue(c), p.random(50, 130));
-                p.circle(p.random(w), p.random(h), p.random(80, w * 0.65));
-            }
-        } else {
-            // 장르 5: 아이소메트릭 라비린스 (Vector Labyrinth)
-            p.strokeWeight(1.5); p.noFill();
-            let step = w / 10;
-            for (let x = 0; x < w; x += step) {
-                for (let y = 0; y < h; y += step) {
-                    p.stroke(p.color(pal[p.floor(p.random(pal.length))]));
-                    if (p.random(1) > 0.5) p.line(x, y, x + step, y + step);
-                    else p.line(x + step, y, x, y + step);
-                }
-            }
-        }
+    /* 6. p5.js 스튜디오 렌더링 */
+    function renderCanvasInStudio() {
+        if (p5Instance) p5Instance.remove();
 
-        // 우측 하단 아티스트 시그니처
-        p.push();
-        let tagText = `${(author || 'ARTIST').toUpperCase()} | #${seed.toString(16).toUpperCase().slice(-5)}`;
-        p.textAlign(p.RIGHT, p.BOTTOM);
-        p.textFont('monospace');
-        p.textSize(Math.min(w, h) * 0.028);
-        p.noStroke();
-        p.fill(8, 8, 10, 200);
-        p.rect(w - Math.min(w, h) * 0.58, h - 30, Math.min(w, h) * 0.55, 22, 4);
-        p.fill(240, 240, 245, 220);
-        p.text(tagText, w - 12, h - 12);
-        p.pop();
-    }
+        const sketch = (p) => {
+            p.setup = () => {
+                let size = p.min(p.windowWidth * 0.52, 540);
+                if (p.windowWidth <= 868) size = p.min(p.windowWidth - 60, 440);
+                p.createCanvas(size, size);
+                drawGenerativeArt(p, currentSeed, artGenre, userNameVal);
+                p.noLoop();
+            };
+        };
 
-    /* 6. p5.js 인스턴스 셋업 */
-    let myP5Instance = null;
-    function setup() {
-        let size = Math.min(windowWidth * 0.52, 540);
-        if (windowWidth <= 868) size = Math.min(windowWidth - 60, 440);
-        let canvas = createCanvas(size, size);
-        canvas.parent('p5-container');
-        background(8, 8, 10);
-        noLoop();
-    }
-
-    function generateArt() {
-        drawGenerativeArt(window, currentSeed, artGenre, userNameVal, width, height);
+        const container = document.getElementById('p5-container');
+        container.innerHTML = '';
+        p5Instance = new p5(sketch, container);
         document.getElementById('actionBtns').style.display = 'flex';
     }
 
     function downloadCanvas() {
-        saveCanvas('art_' + userNameVal, 'jpg');
+        if (p5Instance) p5Instance.saveCanvas('art_' + userNameVal, 'jpg');
     }
 
     async function saveToMuseum() {
         try {
             await db.collection("museum_arts").add({
                 author: userNameVal,
-                password: userPassVal,
+                password: userPwVal,
                 seed: currentSeed,
                 genre: artGenre,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            alert("🏛️ 박물관에 작품이 성공적으로 전시되었습니다!");
+            alert("🏛️ 박물관에 성공적으로 전시되었습니다!");
         } catch (e) {
             console.error(e);
-            alert("전시 에러: " + e.message);
+            alert("전시 중 오류 발생: " + e.message);
         }
     }
 </script>
