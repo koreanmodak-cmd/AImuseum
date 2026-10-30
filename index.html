@@ -3,308 +3,339 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Workspace : Generative Art</title>
-    <!-- p5.js 및 html2canvas 라이브러리 -->
+    <title>AI WORKSPACE : Generative Studio</title>
+    <!-- p5.js 및 Firebase SDK -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
         :root {
-            --bg-color: #0f172a;
-            --panel-bg: #1e293b;
-            --text-color: #f8fafc;
-            --red-color: #ef4444;
-            --yellow-color: #f59e0b;
-            --green-color: #10b981;
+            --bg-dark: #0a0a0c;
+            --panel-bg: #121216;
+            --panel-border: #22222a;
+            --text-main: #f1f5f9;
+            --text-muted: #64748b;
+            --accent-red: #ff4d4d;
+            --accent-yellow: #ffc107;
+            --accent-green: #00e676;
+            --btn-blue: #3b82f6;
         }
+
         * { box-sizing: border-box; }
         body {
-            margin: 0; font-family: 'Pretendard', sans-serif;
-            background-color: var(--bg-color); color: var(--text-color);
+            margin: 0; font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-dark); color: var(--text-main);
             display: flex; flex-direction: column; min-height: 100vh; overflow-x: hidden;
         }
-        header {
-            padding: 15px 20px; background: rgba(0,0,0,0.4); border-bottom: 1px solid #334155;
-            display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between;
-        }
-        .header-title { display: flex; align-items: center; gap: 15px; }
-        .header-title h2 { margin: 0; font-size: 1.3rem; }
-        .museum-link { color: #3b82f6; text-decoration: none; font-weight: bold; font-size: 0.95rem; }
-        .museum-link:hover { text-decoration: underline; }
-        .input-group { display: flex; gap: 8px; flex-wrap: wrap; width: 100%; max-width: 450px; }
-        input { 
-            flex: 1; padding: 10px 14px; border-radius: 6px; border: 1px solid #475569; 
-            background: #0f172a; color: white; min-width: 140px; font-size: 0.95rem;
-        }
-        button {
-            padding: 10px 18px; border: none; border-radius: 6px; cursor: pointer;
-            background: #3b82f6; color: white; font-weight: bold; transition: 0.2s; font-size: 0.95rem;
-            white-space: nowrap;
-        }
-        button:hover { background: #2563eb; }
-        .main-container { display: flex; flex: 1; overflow: hidden; flex-wrap: wrap; }
-        .chat-panel {
-            flex: 1; min-width: 300px; max-width: 35%; background: var(--panel-bg);
-            padding: 20px; overflow-y: auto; border-right: 1px solid #334155; max-height: calc(100vh - 70px);
-        }
-        .canvas-panel {
-            flex: 2; min-width: 300px; display: flex; flex-direction: column;
-            align-items: center; justify-content: center; position: relative; background: #020617;
-            padding: 20px;
-        }
-        .chat-message { margin-bottom: 15px; opacity: 0; transform: translateY(10px); animation: fadeIn 0.4s forwards; }
-        .chat-name { font-weight: bold; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
-        .chat-text { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; font-size: 0.92rem; line-height: 1.45; }
-        
-        .agent-red .chat-name { color: var(--red-color); }
-        .agent-yellow .chat-name { color: var(--yellow-color); }
-        .agent-green .chat-name { color: var(--green-color); }
 
-        #p5-container { box-shadow: 0 10px 30px rgba(0,0,0,0.6); border-radius: 8px; overflow: hidden; }
-        .action-buttons { margin-top: 20px; display: none; gap: 12px; flex-wrap: wrap; justify-content: center; }
+        header {
+            padding: 18px 28px; background: rgba(10, 10, 12, 0.9);
+            border-bottom: 1px solid var(--panel-border);
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-between;
+            backdrop-filter: blur(10px);
+        }
+        .header-brand { display: flex; align-items: center; gap: 20px; }
+        .header-brand h1 { margin: 0; font-size: 1.15rem; letter-spacing: 2px; font-weight: 700; text-transform: uppercase; color: #fff; }
+        .nav-btn {
+            color: #94a3b8; text-decoration: none; font-size: 0.88rem; font-weight: 500;
+            padding: 8px 14px; border-radius: 6px; border: 1px solid var(--panel-border);
+            transition: all 0.2s ease; background: #16161e;
+        }
+        .nav-btn:hover { color: #fff; border-color: #475569; background: #1e1e28; }
+
+        .input-group { display: flex; gap: 10px; width: 100%; max-width: 420px; }
+        input {
+            flex: 1; padding: 11px 16px; border-radius: 6px; border: 1px solid var(--panel-border);
+            background: #14141a; color: #fff; font-size: 0.9rem; outline: none; transition: 0.2s;
+        }
+        input:focus { border-color: #4f46e5; }
+        
+        .btn-primary {
+            padding: 11px 20px; border: none; border-radius: 6px; cursor: pointer;
+            background: #2563eb; color: white; font-weight: 600; font-size: 0.88rem;
+            transition: 0.2s; white-space: nowrap;
+        }
+        .btn-primary:hover { background: #1d4ed8; }
+
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        
+        .chat-panel {
+            flex: 1; min-width: 320px; max-width: 38%; background: var(--panel-bg);
+            padding: 24px; overflow-y: auto; border-right: 1px solid var(--panel-border);
+            display: flex; flex-direction: column; gap: 16px; height: calc(100vh - 73px);
+        }
+        .chat-placeholder { color: var(--text-muted); font-size: 0.88rem; line-height: 1.6; margin: auto 0; text-align: center; }
+
+        .canvas-panel {
+            flex: 2; min-width: 320px; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; position: relative;
+            background: #060608; padding: 30px;
+        }
+
+        .chat-message {
+            opacity: 0; transform: translateY(12px); animation: fadeIn 0.4s forwards ease-out;
+            display: flex; flex-direction: column; gap: 6px;
+        }
+        .chat-header { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.5px; display: flex; align-items: center; gap: 8px; }
+        .chat-body {
+            background: #1a1a22; padding: 14px 16px; border-radius: 8px;
+            font-size: 0.9rem; line-height: 1.55; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.03);
+        }
+        
+        .agent-red .chat-header { color: var(--accent-red); }
+        .agent-yellow .chat-header { color: var(--accent-yellow); }
+        .agent-green .chat-header { color: var(--accent-green); }
+
+        #p5-container {
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8); border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.08); overflow: hidden;
+        }
+        
+        .action-buttons {
+            margin-top: 24px; display: none; gap: 12px; flex-wrap: wrap; justify-content: center;
+        }
+        .btn-secondary {
+            padding: 10px 18px; border-radius: 6px; border: 1px solid var(--panel-border);
+            background: #181820; color: #e2e8f0; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: 0.2s;
+        }
+        .btn-secondary:hover { background: #22222e; border-color: #64748b; color: #fff; }
 
         @keyframes fadeIn { to { opacity: 1; transform: translateY(0); } }
-        
-        @media (max-width: 768px) {
+
+        @media (max-width: 868px) {
             body { overflow-y: auto; }
             .main-container { flex-direction: column; }
-            .chat-panel { max-width: 100%; height: 300px; border-right: none; border-bottom: 1px solid #334155; }
-            .canvas-panel { min-height: 500px; }
+            .chat-panel { max-width: 100%; height: 350px; border-right: none; border-bottom: 1px solid var(--panel-border); }
+            .canvas-panel { min-height: 520px; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="header-title">
-        <h2>🎨 AI Workspace</h2>
-        <a href="museum.html" class="museum-link">🏛️ 박물관 구경하기</a>
+    <div class="header-brand">
+        <h1>AI Studio</h1>
+        <a href="museum.html" class="nav-btn">🏛️ 박물관 전시관 바로가기</a>
     </div>
     <div class="input-group">
-        <input type="text" id="userName" placeholder="이름을 입력하세요 (예: 홍길동)" autocomplete="off">
-        <button id="startBtn">작품 창작하기</button>
+        <input type="text" id="userName" placeholder="사용자 이름 입력 (예: 홍길동)" autocomplete="off">
+        <button id="startBtn" class="btn-primary">작품 생성</button>
     </div>
 </header>
 
 <div class="main-container">
     <div class="chat-panel" id="chatBox">
-        <div style="color: #94a3b8; font-size: 0.9rem;">이름을 입력하고 창작하기를 누르면 에이전트들이 대화를 시작합니다.</div>
+        <div class="chat-placeholder">이름을 입력하면 3명의 AI 에이전트가 토론을 시작하며 고유 추상 작품을 조형합니다.</div>
     </div>
     <div class="canvas-panel">
         <div id="p5-container"></div>
         <div class="action-buttons" id="actionBtns">
-            <button onclick="downloadCanvas()">🖼️ JPG로 저장</button>
-            <button onclick="saveToMuseum()" style="background: #10b981;">🏛️ 박물관에 전시하기</button>
+            <button class="btn-secondary" onclick="downloadCanvas()">🖼️ 고화질 저장</button>
+            <button class="btn-secondary" onclick="saveToMuseum()" style="border-color: #059669; color: #10b981;">🏛️ 박물관에 전시하기</button>
         </div>
     </div>
 </div>
 
 <script>
-    /* =========================================
-       1. Firebase 초기화
-       ========================================= */
+    /* 1. Firebase 초기화 */
     const firebaseConfig = {
         apiKey: "AIzaSyBV08YxtJZ0y6NgXOlRG26mna-jEfsS5tk",
         authDomain: "aimuseum-8c30b.firebaseapp.com",
         projectId: "aimuseum-8c30b",
     };
-    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    /* =========================================
-       2. 상태 변수 및 한글 분해 함수
-       ========================================= */
+    /* 2. 전역 상태 */
     let currentSeed = 0;
-    let extractedLetters = [];
+    let userNameVal = "";
     let artGenre = 0;
 
-    function extractHangul(str) {
-        const chosung = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
-        const jungsung = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
-        let result = [];
-        for (let i = 0; i < str.length; i++) {
-            let code = str.charCodeAt(i) - 44032;
-            if (code > -1 && code < 11172) {
-                result.push(chosung[Math.floor(code / 588)]);
-                result.push(jungsung[Math.floor((code % 588) / 28)]);
-            } else {
-                result.push(str[i]);
-            }
-        }
-        return result.length > 0 ? result : ["A", "R", "T"];
-    }
-
-    /* =========================================
-       3. 동적 AI 대화 엔진
-       ========================================= */
-    const dialogFragments = {
-        red_intro: ["이름의 파동을 스캔 중이야.", "입력값의 기하학적 궤적을 확인했어.", "공간의 온도와 색조를 결정하는 중이야."],
-        red_action: ["메인 베이스는 강렬한 붉은 난색 톤으로 설정할게.", "차가운 새벽빛 그라데이션으로 베이스를 바닥에敷 깔아볼게.", "대비감을 강조하기 위해 어두운 딥 블루 테마를 선택할게."],
-        yellow_intro: ["레드의 색조를 넘겨받았어.", "좋아, 난 구조적 구도와 그리드를 배치할게.", "이름 속 입자들을 공간에 흩뿌릴 준비가 됐어."],
-        yellow_genre: ["바우하우스 스타일의 과감한 도형 배치를 시도해보자.", "유체 역학에 기반한 유기적 곡선 패턴(Flow Field)을 적용 중이야.", "네온 기하학 라인들과 글리치 노이즈로 공간을 구성해볼게."],
-        green_intro: ["조형 작업이 마무리 단계에 접어들었어.", "빛의 질감과 깊이감을 연산하는 중이야.", "마지막 유기적 레이어를 얹을게."],
-        green_action: ["추출된 자음/모음 조각들을 빛 입자 형태로 배치했어.", "이름의 파편들을 3D 관성 회전 구조로 흩뿌렸어.", "텍스처 입자를 입히고 감각적인 갤러리 아트로 완성을 끝마쳤어."]
+    /* 3. 수십억 가지 대화 조합 엔진 (6단계 대화) */
+    const vocabulary = {
+        red_1: [
+            ["이름 '{N}'에서 강렬한 심리적 파동이 감지되었어.", "입력된 '{N}'의 텍스트 궤적을 심층 스캔하는 중이야.", "'{N}'이라는 이름은 매우 깊은 미학적 가능성을 지니고 있어."],
+            ["기초 베이스는 딥한 블랙과 진홍색 톤으로 색채 밀도를 잡을게.", "어두운 미드나잇 그라데이션으로 바닥면의 깊이감을 구축하자.", "단색에 가까운 과감한 색면 대비를 시도해보려고 해."]
+        ],
+        yellow_1: [
+            ["레드의 색채 기조를 확인했어. 난 공간 분할을 맡을게.", "좋아, 그 분위기라면 난 엄격한 기하학적 텐션을 추가하겠어.", "색채의 무게감을 받쳐줄 프레임 구조를 조형해야겠네."],
+            ["중앙 캔버스를 4분할하여 황금비율 그리드를 형성하는 중이야.", "유기적인 펄린 노이즈 곡선을 활용해 파동을 시각화해볼게.", "날카로운 선들과 사선 텍스처를 교차시켜 글리치 텐션을 주겠어."]
+        ],
+        green_1: [
+            ["둘의 구조감이 아주 훌륭해. 난 빛과 입자 질감을 얹을게.", "좋은 조합이야. 난 전체 캔버스의 공기감과 투명도를 조정하겠어.", "균형이 잡혀가는군. 마지막 레이어의 텍스처를 렌더링할 차례야."],
+            ["미세하게 반짝이는 라이트 스펙트럼 필터를 합성하는 중이야.", "부드러운 유체 질감의 에테르 입자들을 공중에 부유시킬게.", "음영의 깊이감을 더하기 위해 은은한 아우라 텍스처를 입히고 있어."]
+        ],
+        red_2: [
+            ["좋아, 옐로의 구조 덕분에 색채의 장력(Tension)이 극대화되었어.", "그린의 유체 질감이 가해지니 색면이 살아 숨쉬는 것 같네.", "이 정도의 대비라면 현대 미술적 아우라가 충분히 형성되었어."]
+        ],
+        yellow_2: [
+            ["시각적 초점이 완벽하게 형성되었어. 기하학적 밸런스는 이상 없어.", "공간의 비대칭적 균형이 오묘한 긴장감을 만들어내고 있어.", "구도상 더 이상의 구조 변경은 필요 없어 보여. 완벽해."]
+        ],
+        green_2: [
+            ["작품 조형 완료. 우측 하단에 '{N}' 아티스트 라벨과 시그니처를 깔끔하게 각인했어.", "최종 렌더링 끝. 우측 하단에 시그니처 배치를 완료했으니 캔버스를 확인해봐.", "작품이 완성되었어. 우측 하단 미니멀 라벨을 확인해봐."]
+        ]
     };
 
-    function getRandom(array, seed) {
-        let x = Math.sin(seed) * 10000;
-        return array[Math.floor((x - Math.floor(x)) * array.length)];
+    function pseudoRandomSelect(arr, seed) {
+        let idx = Math.floor((Math.sin(seed) * 10000 - Math.floor(Math.sin(seed) * 10000)) * arr.length);
+        return arr[idx];
     }
 
-    /* =========================================
-       4. 메인 이벤트 제어
-       ========================================= */
+    /* 4. 메인 대화 및 생성 로직 */
     document.getElementById('startBtn').addEventListener('click', () => {
-        const name = document.getElementById('userName').value.trim();
-        if (!name) return alert("이름을 입력해주세요!");
+        const nameInput = document.getElementById('userName').value.trim();
+        if (!nameInput) return alert("사용자 이름을 입력해주세요.");
+        userNameVal = nameInput;
 
         const chatBox = document.getElementById('chatBox');
         chatBox.innerHTML = '';
         document.getElementById('actionBtns').style.display = 'none';
-        
+
         let hash = 0;
-        for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        for (let i = 0; i < userNameVal.length; i++) hash = userNameVal.charCodeAt(i) + ((hash << 5) - hash);
         currentSeed = Math.abs(hash) + Date.now();
         
         randomSeed(currentSeed);
         noiseSeed(currentSeed);
-
-        extractedLetters = extractHangul(name);
         artGenre = Math.floor(random(0, 4));
+
+        // 6단계 대화 시나리오 구성
+        const script = [
+            { agent: 'agent-red', name: '🔴 RED', text: `${pseudoRandomSelect(vocabulary.red_1[0], currentSeed).replace('{N}', userNameVal)} ${pseudoRandomSelect(vocabulary.red_1[1], currentSeed + 1)}` },
+            { agent: 'agent-yellow', name: '🟡 YELLOW', text: `${pseudoRandomSelect(vocabulary.yellow_1[0], currentSeed + 2)} ${pseudoRandomSelect(vocabulary.yellow_1[1], currentSeed + 3)}` },
+            { agent: 'agent-green', name: '🟢 GREEN', text: `${pseudoRandomSelect(vocabulary.green_1[0], currentSeed + 4)} ${pseudoRandomSelect(vocabulary.green_1[1], currentSeed + 5)}` },
+            { agent: 'agent-red', name: '🔴 RED', text: `${pseudoRandomSelect(vocabulary.red_2[0], currentSeed + 6)}` },
+            { agent: 'agent-yellow', name: '🟡 YELLOW', text: `${pseudoRandomSelect(vocabulary.yellow_2[0], currentSeed + 7)}` },
+            { agent: 'agent-green', name: '🟢 GREEN', text: `${pseudoRandomSelect(vocabulary.green_2[0], currentSeed + 8).replace('{N}', userNameVal)}` }
+        ];
 
         let step = 0;
         const interval = setInterval(() => {
-            if (step === 0) {
-                appendChat('agent-red', '🔴 Red', `${getRandom(dialogFragments.red_intro, currentSeed)} ${getRandom(dialogFragments.red_action, currentSeed + 1)}`);
-            } else if (step === 1) {
-                appendChat('agent-yellow', '🟡 Yellow', `${getRandom(dialogFragments.yellow_intro, currentSeed + 2)} ${getRandom(dialogFragments.yellow_genre, currentSeed + 3)}`);
-            } else if (step === 2) {
-                appendChat('agent-green', '🟢 Green', `${getRandom(dialogFragments.green_intro, currentSeed + 4)} ${getRandom(dialogFragments.green_action, currentSeed + 5)}`);
+            if (step < script.length) {
+                appendChat(script[step].agent, script[step].name, script[step].text);
+                step++;
             } else {
                 clearInterval(interval);
                 generateArt();
             }
-            step++;
-        }, 1300);
+        }, 1100);
     });
 
     function appendChat(className, aiName, text) {
         const chatBox = document.getElementById('chatBox');
         const div = document.createElement('div');
         div.className = `chat-message ${className}`;
-        div.innerHTML = `<div class="chat-name">${aiName}</div><div class="chat-text">${text}</div>`;
+        div.innerHTML = `<div class="chat-header">${aiName}</div><div class="chat-body">${text}</div>`;
         chatBox.appendChild(div);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    /* =========================================
-       5. p5.js 아트 생성 엔진
-       ========================================= */
+    /* 5. p5.js 아트 생성 엔진 (우측 하단 서명 지원) */
     function setup() {
-        let size = min(windowWidth * 0.55, 550);
-        if (windowWidth <= 768) size = min(windowWidth - 40, 450);
+        let size = min(windowWidth * 0.52, 540);
+        if (windowWidth <= 868) size = min(windowWidth - 60, 440);
         let canvas = createCanvas(size, size);
         canvas.parent('p5-container');
-        background(15, 23, 42);
+        background(10, 10, 12);
         noLoop();
     }
 
     function generateArt() {
         randomSeed(currentSeed);
         noiseSeed(currentSeed);
-        background(15, 23, 42);
+        background(10, 10, 12);
 
         let colors = [
-            color(random(180, 255), random(50, 120), random(80, 150)),
-            color(random(50, 120), random(180, 255), random(180, 255)),
-            color(random(230, 255), random(180, 240), random(50, 100))
+            color(random(200, 255), random(40, 90), random(60, 110)),
+            color(random(40, 110), random(180, 240), random(200, 255)),
+            color(random(240, 255), random(190, 230), random(60, 110)),
+            color(240, 240, 245)
         ];
 
+        // 4가지 현대미술 장르 구현
         if (artGenre === 0) {
+            // 장르 0: 미니멀리즘 컬러스페이스 & 선 구조
             noStroke();
-            for (let i = 0; i < 22; i++) {
+            for (let i = 0; i < 12; i++) {
                 fill(random(colors));
-                let shapeType = floor(random(3));
-                if (shapeType === 0) rect(random(width), random(height), random(30, 180), random(30, 180));
-                else if (shapeType === 1) circle(random(width), random(height), random(40, 220));
-                else triangle(random(width), random(height), random(width), random(height), random(width), random(height));
+                rect(random(width * 0.1, width * 0.7), random(height * 0.1, height * 0.7), random(50, 220), random(50, 220));
             }
-        } 
-        else if (artGenre === 1) {
-            noFill();
-            strokeWeight(1.8);
-            for (let i = 0; i < 400; i++) {
+            stroke(255, 255, 255, 120); strokeWeight(0.8);
+            line(width * 0.1, height * 0.5, width * 0.9, height * 0.5);
+        } else if (artGenre === 1) {
+            // 장르 1: 유체 노이즈 필드 (Flow Field)
+            noFill(); strokeWeight(1.2);
+            for (let i = 0; i < 350; i++) {
                 stroke(random(colors));
                 beginShape();
                 let x = random(width), y = random(height);
-                for (let j = 0; j < 18; j++) {
+                for (let j = 0; j < 16; j++) {
                     vertex(x, y);
-                    let angle = noise(x * 0.008, y * 0.008) * TWO_PI * 4;
-                    x += cos(angle) * 9;
-                    y += sin(angle) * 9;
+                    let angle = noise(x * 0.006, y * 0.006) * TWO_PI * 4;
+                    x += cos(angle) * 8; y += sin(angle) * 8;
                 }
                 endShape();
             }
-        }
-        else if (artGenre === 2) {
-            strokeWeight(random(1.5, 4));
-            for (let i = 0; i < 180; i++) {
+        } else if (artGenre === 2) {
+            // 장르 2: 사이버 글리치 매트릭스
+            strokeWeight(random(1, 3));
+            for (let i = 0; i < 160; i++) {
                 stroke(random(colors));
                 let x = random(width), y = random(height);
-                line(x, y, x + random(-120, 120), y);
-                if (random(1) > 0.75) {
-                    noStroke();
-                    fill(random(colors));
-                    rect(x, y, random(10, 60), random(3, 12));
-                }
+                line(x, y, x + random(-140, 140), y);
             }
-        }
-        else {
+        } else {
+            // 장르 3: 오로라 에테르 구체
             noStroke();
-            for (let i = 0; i < 16; i++) {
+            for (let i = 0; i < 14; i++) {
                 let c = random(colors);
-                fill(red(c), green(c), blue(c), random(70, 140));
-                circle(random(width), random(height), random(120, 380));
+                fill(red(c), green(c), blue(c), random(60, 120));
+                circle(random(width), random(height), random(100, 320));
             }
         }
 
-        textAlign(CENTER, CENTER);
-        for (let i = 0; i < extractedLetters.length; i++) {
-            push();
-            translate(random(width), random(height));
-            rotate(random(TWO_PI));
-            fill(255, 255, 255, random(80, 180));
-            textSize(random(25, 110));
-            text(extractedLetters[i], 0, 0);
-            pop();
-        }
+        // ★ 우측 하단 단정하고 깔끔한 아티스트 시그니처 배치 ★
+        push();
+        let tagText = `${userNameVal.toUpperCase()} | EDITION #${currentSeed.toString(16).toUpperCase().slice(-5)}`;
+        textAlign(RIGHT, BOTTOM);
+        textFont('monospace');
+        textSize(10);
+        
+        // 시그니처 플레이트 우측 하단 배치
+        noStroke();
+        fill(10, 10, 12, 180);
+        rect(width - 240, height - 36, 220, 26, 4);
+        
+        fill(226, 232, 240, 210);
+        text(tagText, width - 28, height - 20);
+        
+        stroke(255, 255, 255, 40);
+        strokeWeight(0.5);
+        line(width - 230, height - 16, width - 28, height - 16);
+        pop();
 
         document.getElementById('actionBtns').style.display = 'flex';
     }
 
-    /* =========================================
-       6. 저장 및 박물관 연동
-       ========================================= */
     function downloadCanvas() {
-        saveCanvas('ai_art_' + Date.now(), 'jpg');
+        saveCanvas('art_' + userNameVal, 'jpg');
     }
 
     async function saveToMuseum() {
-        const name = document.getElementById('userName').value.trim();
         try {
             await db.collection("museum_arts").add({
-                author: name,
+                author: userNameVal,
                 seed: currentSeed,
                 genre: artGenre,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            alert("🏛️ 박물관에 성공적으로 전시되었습니다!");
+            alert("🏛️ 박물관에 작품이 성공적으로 전시되었습니다!");
         } catch (e) {
             console.error(e);
-            alert("전시 중 오류가 발생했습니다: " + e.message);
+            alert("전시 오류: " + e.message);
         }
     }
 </script>
