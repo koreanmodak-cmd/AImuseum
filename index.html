@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI WORKSPACE : Generative Studio</title>
+    <!-- p5.js 및 Firebase SDK -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
@@ -11,11 +12,11 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         :root {
-            --bg-dark: #08080a;
-            --panel-bg: #101014;
-            --panel-border: rgba(255, 255, 255, 0.08);
-            --text-main: #f1f5f9;
-            --text-muted: #64748b;
+            --bg-dark: #09090b;
+            --panel-bg: #111115;
+            --panel-border: rgba(255, 255, 255, 0.07);
+            --text-main: #f4f4f5;
+            --text-muted: #71717a;
             --agent-red: #f43f5e;
             --agent-yellow: #eab308;
             --agent-green: #10b981;
@@ -29,34 +30,34 @@
         }
 
         header {
-            padding: 18px 32px; background: rgba(8, 8, 10, 0.95);
+            padding: 18px 32px; background: rgba(9, 9, 11, 0.95);
             border-bottom: 1px solid var(--panel-border);
             display: flex; gap: 20px; align-items: center; justify-content: space-between;
             backdrop-filter: blur(12px);
         }
         .header-brand { display: flex; align-items: center; gap: 24px; }
-        .header-brand h1 { font-size: 0.95rem; letter-spacing: 3px; font-weight: 600; text-transform: uppercase; color: #fff; }
+        .header-brand h1 { font-size: 0.88rem; letter-spacing: 3px; font-weight: 600; text-transform: uppercase; color: #fff; }
         
         .nav-btn {
-            color: var(--text-muted); text-decoration: none; font-size: 0.82rem; font-weight: 500;
+            color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 500;
             padding: 7px 14px; border-radius: 4px; border: 1px solid var(--panel-border);
             transition: all 0.2s ease; letter-spacing: 0.5px;
         }
         .nav-btn:hover { color: #fff; border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.03); }
 
-        .input-group { display: flex; gap: 10px; width: 100%; max-width: 380px; }
+        .input-group { display: flex; gap: 10px; width: 100%; max-width: 320px; }
         input {
             flex: 1; padding: 9px 14px; border-radius: 4px; border: 1px solid var(--panel-border);
-            background: #121216; color: #fff; font-size: 0.85rem; outline: none; transition: 0.2s;
+            background: #141418; color: #fff; font-size: 0.85rem; outline: none; transition: 0.2s;
         }
         input:focus { border-color: rgba(255,255,255,0.3); }
         
         .btn-primary {
             padding: 9px 18px; border: 1px solid var(--panel-border); border-radius: 4px; cursor: pointer;
-            background: #f8fafc; color: #0f172a; font-weight: 600; font-size: 0.82rem;
+            background: #f4f4f5; color: #09090b; font-weight: 600; font-size: 0.82rem;
             transition: 0.2s; white-space: nowrap; letter-spacing: 0.5px;
         }
-        .btn-primary:hover { background: #e2e8f0; }
+        .btn-primary:hover { background: #e4e4e7; }
 
         .main-container { display: flex; flex: 1; overflow: hidden; }
         
@@ -65,7 +66,7 @@
             padding: 28px; overflow-y: auto; border-right: 1px solid var(--panel-border);
             display: flex; flex-direction: column; gap: 18px; height: calc(100vh - 65px);
         }
-        .chat-placeholder { color: var(--text-muted); font-size: 0.85rem; line-height: 1.7; margin: auto 0; text-align: center; font-weight: 300; }
+        .chat-placeholder { color: var(--text-muted); font-size: 0.82rem; line-height: 1.7; margin: auto 0; text-align: center; font-weight: 300; }
 
         .canvas-panel {
             flex: 2; min-width: 320px; display: flex; flex-direction: column;
@@ -77,8 +78,8 @@
             opacity: 0; transform: translateY(10px); animation: fadeIn 0.35s forwards ease-out;
             display: flex; flex-direction: column; gap: 6px;
         }
-        .chat-header { font-size: 0.75rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
-        .chat-header::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; }
+        .chat-header { font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; font-family: monospace; }
+        .chat-header::before { content: ''; display: inline-block; width: 5px; height: 5px; border-radius: 50%; }
         
         .agent-red .chat-header { color: var(--agent-red); }
         .agent-red .chat-header::before { background: var(--agent-red); }
@@ -89,7 +90,7 @@
 
         .chat-body {
             background: rgba(255, 255, 255, 0.02); padding: 14px 16px; border-radius: 4px;
-            font-size: 0.85rem; line-height: 1.6; color: #cbd5e1; border: 1px solid rgba(255,255,255,0.04); font-weight: 300;
+            font-size: 0.85rem; line-height: 1.6; color: #a1a1aa; border: 1px solid rgba(255,255,255,0.03); font-weight: 300;
         }
 
         #p5-container {
@@ -102,7 +103,7 @@
         }
         .btn-secondary {
             padding: 9px 18px; border-radius: 4px; border: 1px solid var(--panel-border);
-            background: #121216; color: #e2e8f0; font-size: 0.82rem; font-weight: 500;
+            background: #111115; color: #e4e4e7; font-size: 0.82rem; font-weight: 500;
             cursor: pointer; transition: 0.2s; letter-spacing: 0.5px;
         }
         .btn-secondary:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); color: #fff; }
@@ -132,12 +133,12 @@
 
 <div class="main-container">
     <div class="chat-panel" id="chatBox">
-        <div class="chat-placeholder">Enter an artist name to initiate the synthesis dialogue between Agent Red, Yellow, and Green.</div>
+        <div class="chat-placeholder">Enter an artist name to initiate synthesis between Agent Red, Yellow, and Green.</div>
     </div>
     <div class="canvas-panel">
         <div id="p5-container"></div>
         <div class="action-buttons" id="actionBtns">
-            <button class="btn-secondary" onclick="downloadCanvas()">Export Canvas</button>
+            <button class="btn-secondary" onclick="export4KCanvas()">Export 4K Canvas</button>
             <button class="btn-secondary" onclick="saveToMuseum()">Publish to Museum</button>
         </div>
     </div>
@@ -156,112 +157,125 @@
     let currentSeed = 0;
     let userNameVal = "";
     let artGenre = 0;
+    let currentDialogue = [];
     let p5Instance = null;
 
-    /* 고품격 통합 생성형 아트 엔진 (Texture & Grain 지원) */
+    /* 단일 통합 생성형 아트 엔진 (단계별 드로잉 & 상대좌표계 완전 보장) */
     const ArtEngine = {
-        render: function(p, seed, genre, author) {
+        renderStep: function(p, seed, genre, author, maxStep) {
             p.randomSeed(seed);
             p.noiseSeed(seed);
-            p.pixelDensity(2);
-            p.background(6, 6, 8);
+            
+            const w = p.width;
+            const h = p.height;
 
             const palettes = [
-                [p.color(240, 240, 245), p.color(180, 180, 190), p.color(90, 90, 100), p.color(225, 29, 72)],
+                [p.color(240, 240, 245), p.color(160, 160, 175), p.color(80, 80, 90), p.color(225, 29, 72)],
                 [p.color(225, 29, 72), p.color(234, 179, 8), p.color(30, 58, 138), p.color(248, 250, 252)],
                 [p.color(20, 184, 166), p.color(99, 102, 241), p.color(244, 63, 94), p.color(255, 255, 255)],
                 [p.color(217, 119, 6), p.color(180, 83, 9), p.color(120, 53, 15), p.color(254, 243, 199)],
-                [p.color(244, 114, 182), p.color(129, 140, 248), p.color(52, 211, 153), p.color(30, 41, 59)]
+                [p.color(244, 114, 182), p.color(129, 140, 248), p.color(52, 211, 153), p.color(30, 41, 59)],
+                [p.color(255, 255, 255), p.color(120, 120, 130), p.color(40, 40, 48), p.color(16, 185, 129)]
             ];
-
             let palette = palettes[p.floor(p.random(0, palettes.length))];
 
-            // 1. 깊이감을 위한 그래디언트 필드
-            p.noFill();
-            for (let r = p.width * 1.2; r > 0; r -= 15) {
-                let c = p.random(palette);
-                p.stroke(p.red(c), p.green(c), p.blue(c), 8);
-                p.strokeWeight(12);
-                p.circle(p.width / 2, p.height / 2, r);
-            }
-
-            // 2. 장르별 핵심 아키텍처
-            if (genre === 0) {
-                // Bauhaus Minimalist Structure
-                p.noStroke();
-                for (let i = 0; i < 18; i++) {
-                    let c = p.random(palette);
-                    p.fill(p.red(c), p.green(c), p.blue(c), p.random(140, 220));
-                    let w = p.random(p.width * 0.1, p.width * 0.45);
-                    let h = p.random(p.height * 0.1, p.height * 0.45);
-                    let x = p.random(p.width * 0.1, p.width * 0.8 - w);
-                    let y = p.random(p.height * 0.1, p.height * 0.8 - h);
-                    p.rect(x, y, w, h, p.random(0, 8));
-                }
-            } else if (genre === 1) {
-                // Organic Fluid Field
+            // STEP 1: RED - Background Aura & Gradient Field
+            if (maxStep >= 1) {
+                p.background(8, 8, 10);
                 p.noFill();
-                p.strokeWeight(p.random(0.8, 1.8));
-                for (let i = 0; i < 450; i++) {
+                for (let r = w * 1.3; r > 0; r -= w * 0.03) {
                     let c = p.random(palette);
-                    p.stroke(p.red(c), p.green(c), p.blue(c), p.random(100, 200));
-                    p.beginShape();
-                    let x = p.random(p.width), y = p.random(p.height);
-                    for (let j = 0; j < 22; j++) {
-                        p.vertex(x, y);
-                        let angle = p.noise(x * 0.004, y * 0.004) * p.TWO_PI * 4;
-                        x += p.cos(angle) * 7; y += p.sin(angle) * 7;
+                    p.stroke(p.red(c), p.green(c), p.blue(c), 6);
+                    p.strokeWeight(w * 0.025);
+                    p.circle(w / 2, h / 2, r);
+                }
+            }
+
+            // STEP 2: YELLOW - Geometry & Vector Flow Field
+            if (maxStep >= 2) {
+                if (genre === 0) {
+                    p.noStroke();
+                    let count = p.floor(p.random(16, 28));
+                    for (let i = 0; i < count; i++) {
+                        let c = p.random(palette);
+                        p.fill(p.red(c), p.green(c), p.blue(c), p.random(130, 220));
+                        let sw = p.random(w * 0.08, w * 0.4);
+                        let sh = p.random(h * 0.08, h * 0.4);
+                        let sx = p.random(w * 0.08, w * 0.9 - sw);
+                        let sy = p.random(h * 0.08, h * 0.9 - sh);
+                        p.rect(sx, sy, sw, sh, p.random(0, w * 0.02));
                     }
-                    p.endShape();
+                    p.stroke(255, 255, 255, 90);
+                    p.strokeWeight(w * 0.0015);
+                    p.line(w * 0.08, h * 0.5, w * 0.92, h * 0.5);
+                } else if (genre === 1) {
+                    p.noFill();
+                    p.strokeWeight(w * 0.0025);
+                    let lines = p.floor(p.random(350, 550));
+                    for (let i = 0; i < lines; i++) {
+                        let c = p.random(palette);
+                        p.stroke(p.red(c), p.green(c), p.blue(c), p.random(90, 190));
+                        p.beginShape();
+                        let x = p.random(w), y = p.random(h);
+                        for (let j = 0; j < 20; j++) {
+                            p.vertex(x, y);
+                            let angle = p.noise(x * 0.005, y * 0.005) * p.TWO_PI * 4;
+                            x += p.cos(angle) * (w * 0.015);
+                            y += p.sin(angle) * (h * 0.015);
+                        }
+                        p.endShape();
+                    }
+                } else if (genre === 2) {
+                    for (let i = 0; i < 200; i++) {
+                        let c = p.random(palette);
+                        p.stroke(p.red(c), p.green(c), p.blue(c), p.random(110, 230));
+                        p.strokeWeight(p.random(w * 0.002, w * 0.006));
+                        let x = p.random(w), y = p.random(h);
+                        let len = p.random(w * 0.05, w * 0.35);
+                        p.line(x, y, x + len, y);
+                    }
+                } else {
+                    p.noStroke();
+                    for (let i = 0; i < 18; i++) {
+                        let c = p.random(palette);
+                        p.fill(p.red(c), p.green(c), p.blue(c), p.random(30, 90));
+                        p.circle(p.random(w), p.random(h), p.random(w * 0.2, w * 0.65));
+                    }
                 }
-            } else if (genre === 2) {
-                // Constructivist Glitch Matrix
-                p.strokeWeight(1);
-                for (let i = 0; i < 220; i++) {
-                    let c = p.random(palette);
-                    p.stroke(p.red(c), p.green(c), p.blue(c), p.random(120, 240));
-                    let x = p.random(p.width), y = p.random(p.height);
-                    p.line(x, y, x + p.random(-150, 150), y);
+            }
+
+            // STEP 3: GREEN - Texture, Film Grain & Signature Stamp
+            if (maxStep >= 3) {
+                p.loadPixels();
+                for (let i = 0; i < p.pixels.length; i += 4) {
+                    let grain = (p.random(-1, 1) * 14);
+                    p.pixels[i] = p.constrain(p.pixels[i] + grain, 0, 255);
+                    p.pixels[i+1] = p.constrain(p.pixels[i+1] + grain, 0, 255);
+                    p.pixels[i+2] = p.constrain(p.pixels[i+2] + grain, 0, 255);
                 }
-            } else {
-                // Ambient Aurora Sphere
+                p.updatePixels();
+
+                p.push();
+                let tag = `${(author || 'ANONYMOUS').toUpperCase()} // ED. #${seed.toString(16).toUpperCase().slice(-5)}`;
+                p.textAlign(p.RIGHT, p.BOTTOM);
+                p.textFont('monospace');
+                p.textSize(p.max(8.5, w * 0.022));
+                
                 p.noStroke();
-                for (let i = 0; i < 16; i++) {
-                    let c = p.random(palette);
-                    p.fill(p.red(c), p.green(c), p.blue(c), p.random(30, 90));
-                    p.circle(p.random(p.width), p.random(p.height), p.random(120, 380));
-                }
+                p.fill(8, 8, 10, 210);
+                let tw = p.textWidth(tag);
+                p.rect(w - tw - (w * 0.05), h - (h * 0.07), tw + (w * 0.025), h * 0.045, 2);
+                
+                p.fill(244, 244, 245, 210);
+                p.text(tag, w - (w * 0.035), h - (h * 0.035));
+                p.pop();
             }
-
-            // 3. 미세 필름 그레인 & 질감 오버레이 (Canvas Texture Engine)
-            p.loadPixels();
-            for (let i = 0; i < p.pixels.length; i += 4) {
-                let grain = (p.random(-1, 1) * 16);
-                p.pixels[i] = p.constrain(p.pixels[i] + grain, 0, 255);
-                p.pixels[i+1] = p.constrain(p.pixels[i+1] + grain, 0, 255);
-                p.pixels[i+2] = p.constrain(p.pixels[i+2] + grain, 0, 255);
-            }
-            p.updatePixels();
-
-            // 4. 우측 하단 아티스트 시그니처 배지
-            p.push();
-            let tag = `${(author || 'ANONYMOUS').toUpperCase()} // ED. #${seed.toString(16).toUpperCase().slice(-5)}`;
-            p.textAlign(p.RIGHT, p.BOTTOM);
-            p.textFont('monospace');
-            p.textSize(p.max(8.5, p.width * 0.022));
-            
-            p.noStroke();
-            p.fill(6, 6, 8, 220);
-            let tw = p.textWidth(tag);
-            p.rect(p.width - tw - 24, p.height - 34, tw + 12, 22, 2);
-            
-            p.fill(241, 245, 249, 210);
-            p.text(tag, p.width - 18, p.height - 18);
-            p.pop();
+        },
+        render: function(p, seed, genre, author) {
+            this.renderStep(p, seed, genre, author, 3);
         }
     };
 
-    /* 대화 시스템 프래그먼트 */
     const vocabulary = {
         red_1: [
             ["Analyzing structural resonance of '{N}'.", "Scanning semantic profile for '{N}'."],
@@ -282,7 +296,6 @@
         return arr[idx];
     }
 
-    /* 이벤트 바인딩 */
     document.getElementById('startBtn').addEventListener('click', () => {
         const nameInput = document.getElementById('userName').value.trim();
         if (!nameInput) return alert("Please enter an artist name.");
@@ -297,22 +310,29 @@
         currentSeed = Math.abs(hash) + Date.now();
         artGenre = Math.floor((currentSeed % 100) / 25) % 4;
 
-        const script = [
-            { agent: 'agent-red', name: 'AGENT RED', text: `${pseudoSelect(vocabulary.red_1[0], currentSeed).replace('{N}', userNameVal)} ${pseudoSelect(vocabulary.red_1[1], currentSeed + 1)}` },
-            { agent: 'agent-yellow', name: 'AGENT YELLOW', text: `${pseudoSelect(vocabulary.yellow_1[0], currentSeed + 2)} ${pseudoSelect(vocabulary.yellow_1[1], currentSeed + 3)}` },
-            { agent: 'agent-green', name: 'AGENT GREEN', text: `${pseudoSelect(vocabulary.green_1[0], currentSeed + 4)} ${pseudoSelect(vocabulary.green_1[1], currentSeed + 5).replace('{N}', userNameVal)}` }
+        currentDialogue = [
+            { agent: 'agent-red', name: 'RED // 01', text: `${pseudoSelect(vocabulary.red_1[0], currentSeed).replace('{N}', userNameVal)} ${pseudoSelect(vocabulary.red_1[1], currentSeed + 1)}` },
+            { agent: 'agent-yellow', name: 'YELLOW // 02', text: `${pseudoSelect(vocabulary.yellow_1[0], currentSeed + 2)} ${pseudoSelect(vocabulary.yellow_1[1], currentSeed + 3)}` },
+            { agent: 'agent-green', name: 'GREEN // 03', text: `${pseudoSelect(vocabulary.green_1[0], currentSeed + 4)} ${pseudoSelect(vocabulary.green_1[1], currentSeed + 5).replace('{N}', userNameVal)}` }
         ];
+
+        // 캔버스 초기화
+        initStudioCanvas();
 
         let step = 0;
         const interval = setInterval(() => {
-            if (step < script.length) {
-                appendChat(script[step].agent, script[step].name, script[step].text);
+            if (step < currentDialogue.length) {
+                appendChat(currentDialogue[step].agent, currentDialogue[step].name, currentDialogue[step].text);
+                // 실시간 순차 드로잉 렌더링 호출
+                if (p5Instance) {
+                    p5Instance.drawStep(step + 1);
+                }
                 step++;
             } else {
                 clearInterval(interval);
-                renderStudioCanvas();
+                document.getElementById('actionBtns').style.display = 'flex';
             }
-        }, 900);
+        }, 1000);
     });
 
     function appendChat(className, aiName, text) {
@@ -324,35 +344,48 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function renderStudioCanvas() {
+    function initStudioCanvas() {
         if (p5Instance) p5Instance.remove();
 
         const sketch = (p) => {
+            let currentDrawingStep = 0;
             p.setup = () => {
                 let size = p.min(p.windowWidth * 0.5, 520);
                 if (p.windowWidth <= 868) size = p.min(p.windowWidth - 60, 420);
                 p.createCanvas(size, size);
-                ArtEngine.render(p, currentSeed, artGenre, userNameVal);
+                p.background(8, 8, 10);
                 p.noLoop();
+            };
+            p.drawStep = (step) => {
+                currentDrawingStep = step;
+                ArtEngine.renderStep(p, currentSeed, artGenre, userNameVal, currentDrawingStep);
             };
         };
 
         const container = document.getElementById('p5-container');
         container.innerHTML = '';
         p5Instance = new p5(sketch, container);
-        document.getElementById('actionBtns').style.display = 'flex';
     }
 
-    function downloadCanvas() {
-        if (p5Instance) p5Instance.saveCanvas('art_' + userNameVal, 'jpg');
+    /* 4K 고해상도 백그라운드 내보내기 함수 */
+    function export4KCanvas() {
+        const offscreenSketch = (p) => {
+            p.setup = () => {
+                p.createCanvas(2400, 2400);
+                ArtEngine.render(p, currentSeed, artGenre, userNameVal);
+                p.saveCanvas(`art_4K_${userNameVal}`, 'jpg');
+                p.remove();
+            };
+        };
+        new p5(offscreenSketch);
     }
 
-    /* 전시 시점에만 비밀번호 입력 요청 */
+    /* 전시 및 비평 대화 Firestore 저장 */
     async function saveToMuseum() {
-        const password = prompt("작품 삭제에 사용할 비밀번호(4자리 이상)를 입력하세요:");
+        const password = prompt("Set a deletion password (4+ digits) for this artwork:");
         if (password === null) return;
         if (!password || password.trim().length < 4) {
-            return alert("비밀번호는 4자리 이상이어야 합니다.");
+            return alert("Password must be at least 4 characters.");
         }
 
         try {
@@ -361,9 +394,10 @@
                 password: password.trim(),
                 seed: currentSeed,
                 genre: artGenre,
+                dialogue: currentDialogue,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            alert("The artwork has been successfully published to the museum archive.");
+            alert("The artwork & dialogue transcript have been published to the museum.");
         } catch (e) {
             console.error(e);
             alert("Error publishing artwork: " + e.message);
