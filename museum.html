@@ -12,9 +12,9 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         :root {
-            --bg-dark: #08080a;
-            --panel-bg: #111116;
-            --panel-border: #22222e;
+            --bg-dark: #0a0a0c;
+            --panel-bg: #121216;
+            --panel-border: #22222a;
             --text-main: #f1f5f9;
             --text-muted: #64748b;
         }
@@ -47,28 +47,26 @@
 
         .art-card {
             background: var(--panel-bg); border-radius: 8px; padding: 18px;
-            display: flex; flex-direction: column; align-items: center;
+            display: flex; flex-direction: column; align-items: center; position: relative;
             border: 1px solid var(--panel-border); transition: transform 0.2s, border-color 0.2s;
         }
         .art-card:hover { transform: translateY(-4px); border-color: #334155; }
         
-        .canvas-mount {
-            width: 240px; height: 240px; border-radius: 4px; overflow: hidden;
-            background: #000; display: flex; align-items: center; justify-content: center;
+        .art-canvas-box {
+            width: 100%; aspect-ratio: 1/1; border-radius: 4px; overflow: hidden; background: #000;
         }
 
         .art-info {
             margin-top: 14px; width: 100%; display: flex; justify-content: space-between; align-items: center;
         }
         .art-title { font-weight: 600; font-size: 0.95rem; color: #f8fafc; }
-        .art-sub { font-size: 0.78rem; color: var(--text-muted); font-family: monospace; }
         
-        .btn-delete {
-            margin-top: 12px; width: 100%; padding: 8px; border-radius: 5px;
-            border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.08);
-            color: #ef4444; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s;
+        .delete-btn {
+            background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem;
+            cursor: pointer; transition: 0.2s; font-weight: 600;
         }
-        .btn-delete:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+        .delete-btn:hover { background: rgba(239, 68, 68, 0.25); color: #fff; }
 
         #loading { font-size: 0.9rem; color: var(--text-muted); grid-column: 1 / -1; text-align: center; padding: 60px; }
     </style>
@@ -77,11 +75,11 @@
 
 <header>
     <h1>🏛️ AI Museum Archive</h1>
-    <a href="index.html" class="nav-btn">🎨 작품 창작소로 돌아가기</a>
+    <a href="index.html" class="nav-btn">🎨 작품 제작소로 돌아가기</a>
 </header>
 
 <div class="gallery" id="gallery">
-    <div id="loading">박물관 전시 아카이브를 불러오는 중입니다...</div>
+    <div id="loading">박물관 전시 기록을 불러오는 중입니다...</div>
 </div>
 
 <script>
@@ -94,43 +92,190 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    /* 2. 공통 정밀 예술 드로잉 함수 (index.html과 100% 동일 수식) */
-    function drawGenerativeArt(p, seed, genre, author, w, h) {
+    /* 2. index.html과 100% 동일한 공통 생성형 아트 엔진 */
+    function drawGenerativeArt(p, seed, genre, author) {
         p.randomSeed(seed);
         p.noiseSeed(seed);
-        
-        const palettes = [
-            ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
-            ['#00f5d4', '#7b2cbf', '#f72585', '#4cc9f0', '#ffffff'],
-            ['#d4af37', '#1a1a1a', '#f5f5f7', '#8a795d', '#ffffff'],
-            ['#2a9d8f', '#e76f51', '#f4a261', '#e9c46a', '#264653'],
-            ['#00e676', '#00b0ff', '#651fff', '#f50057', '#ffffff'],
-            ['#ffffff', '#888888', '#444444', '#222222', '#ff3366']
-        ];
-        
-        let pal = palettes[Math.floor(p.random(palettes.length))];
         p.background(8, 8, 10);
-        
-        let g = genre % 6;
-        if (g === 0) {
-            p.push();
-            p.translate(w / 2, h / 2);
-            let numPoints = p.floor(p.random(120, 280));
-            let radius = Math.min(w, h) * 0.38;
-            for (let i = 0; i < numPoints; i++) {
-                let angle = p.map(i, 0, numPoints, 0, p.TWO_PI * 5);
-                let r = p.map(i, 0, numPoints, 10, radius);
-                let x = r * p.cos(angle);
-                let y = r * p.sin(angle);
-                p.stroke(p.color(pal[i % pal.length]));
-                p.strokeWeight(p.random(1, 2.2));
-                p.noFill();
-                p.ellipse(x, y, p.random(10, 50));
-                if (i % 4 === 0) p.line(0, 0, x, y);
+
+        const palettes = [
+            [p.color(255, 0, 110), p.color(0, 245, 212), p.color(123, 44, 191), p.color(255, 255, 255)],
+            [p.color(220, 38, 38), p.color(234, 179, 8), p.color(30, 58, 138), p.color(248, 250, 252)],
+            [p.color(255, 255, 255), p.color(160, 160, 170), p.color(80, 80, 90), p.color(220, 38, 38)],
+            [p.color(194, 89, 58), p.color(224, 159, 112), p.color(107, 142, 123), p.color(244, 235, 222)],
+            [p.color(16, 185, 129), p.color(139, 92, 246), p.color(59, 130, 246), p.color(251, 191, 36)],
+            [p.color(0, 255, 102), p.color(255, 255, 255), p.color(40, 40, 50), p.color(255, 0, 80)],
+            [p.color(245, 158, 11), p.color(217, 119, 6), p.color(180, 83, 9), p.color(254, 243, 199)],
+            [p.color(244, 114, 182), p.color(165, 180, 252), p.color(147, 197, 253), p.color(30, 41, 59)]
+        ];
+
+        let paletteIdx = p.floor(p.random(0, palettes.length));
+        let colors = palettes[paletteIdx];
+
+        if (genre === 0) {
+            p.noStroke();
+            let count = p.floor(p.random(15, 30));
+            for (let i = 0; i < count; i++) {
+                p.fill(p.random(colors));
+                let shapeType = p.floor(p.random(4));
+                let x = p.random(p.width * 0.05, p.width * 0.8);
+                let y = p.random(p.height * 0.05, p.height * 0.8);
+                let w = p.random(30, p.width * 0.4);
+                let h = p.random(30, p.height * 0.4);
+                if (shapeType === 0) p.rect(x, y, w, h, p.random(0, 15));
+                else if (shapeType === 1) p.circle(x, y, w);
+                else if (shapeType === 2) p.triangle(x, y, x + w, y, x + w/2, y + h);
+                else p.arc(x, y, w, w, 0, p.HALF_PI * p.floor(p.random(1, 5)));
             }
-            p.pop();
-        } else if (g === 1) {
-            p.noFill();
-            p.strokeWeight(p.random(1, 2));
-            for (let i = 0; i < 380; i++) {
-                p.stroke(
+            p.stroke(255, 255, 255, 80); p.strokeWeight(0.8);
+            p.line(p.width * 0.1, p.height * 0.5, p.width * 0.9, p.height * 0.5);
+        } else if (genre === 1) {
+            p.noFill(); p.strokeWeight(p.random(0.8, 2.2));
+            let lines = p.floor(p.random(300, 600));
+            for (let i = 0; i < lines; i++) {
+                p.stroke(p.random(colors));
+                p.beginShape();
+                let x = p.random(p.width), y = p.random(p.height);
+                for (let j = 0; j < 18; j++) {
+                    p.vertex(x, y);
+                    let angle = p.noise(x * 0.005, y * 0.005) * p.TWO_PI * 5;
+                    x += p.cos(angle) * 8; y += p.sin(angle) * 8;
+                }
+                p.endShape();
+            }
+        } else if (genre === 2) {
+            for (let i = 0; i < 180; i++) {
+                p.stroke(p.random(colors));
+                p.strokeWeight(p.random(1, 4));
+                let x = p.random(p.width), y = p.random(p.height);
+                let len = p.random(20, 180);
+                p.line(x, y, x + len, y);
+                if (p.random(1) > 0.7) {
+                    p.noStroke(); p.fill(p.random(colors));
+                    p.rect(x, y, p.random(10, 40), p.random(2, 10));
+                }
+            }
+        } else if (genre === 3) {
+            p.noStroke();
+            for (let i = 0; i < 18; i++) {
+                let c = p.random(colors);
+                p.fill(p.red(c), p.green(c), p.blue(c), p.random(40, 110));
+                p.circle(p.random(p.width), p.random(p.height), p.random(120, 360));
+            }
+        } else if (genre === 4) {
+            p.noFill(); p.strokeWeight(1);
+            p.translate(p.width / 2, p.height / 2);
+            let rings = p.floor(p.random(8, 20));
+            for (let i = 0; i < rings; i++) {
+                p.stroke(p.random(colors));
+                let r = i * (p.width / (rings * 2.2));
+                p.circle(0, 0, r * 2);
+                let numPoints = p.floor(p.random(4, 12)) * 2;
+                for (let a = 0; a < p.TWO_PI; a += p.TWO_PI / numPoints) {
+                    p.line(p.cos(a) * r, p.sin(a) * r, p.cos(a) * (r + 20), p.sin(a) * (r + 20));
+                }
+            }
+            p.resetMatrix();
+        } else {
+            p.noFill(); p.strokeWeight(1.2);
+            let density = p.floor(p.random(20, 40));
+            for (let y = 0; y < p.height; y += p.height / density) {
+                p.stroke(p.random(colors));
+                p.beginShape();
+                for (let x = 0; x <= p.width; x += 15) {
+                    let n = p.noise(x * 0.008, y * 0.008) * 80;
+                    p.vertex(x, y + n);
+                }
+                p.endShape();
+            }
+        }
+
+        p.push();
+        let tagText = `${(author || 'ANONYMOUS').toUpperCase()} | ED. #${seed.toString(16).toUpperCase().slice(-5)}`;
+        p.textAlign(p.RIGHT, p.BOTTOM);
+        p.textFont('monospace');
+        p.textSize(p.max(9, p.width * 0.022));
+        
+        p.noStroke();
+        p.fill(8, 8, 10, 200);
+        let boxWidth = p.textWidth(tagText) + 20;
+        p.rect(p.width - boxWidth - 15, p.height - 38, boxWidth + 10, 26, 4);
+        
+        p.fill(226, 232, 240, 220);
+        p.text(tagText, p.width - 20, p.height - 20);
+        p.pop();
+    }
+
+    /* 3. Firestore 데이터 로드 및 삭제 처리 */
+    async function loadMuseum() {
+        const gallery = document.getElementById('gallery');
+        try {
+            const snapshot = await db.collection("museum_arts").orderBy("createdAt", "desc").limit(24).get();
+            const loading = document.getElementById('loading');
+            if (loading) loading.remove();
+
+            if (snapshot.empty) {
+                gallery.innerHTML = "<div style='color:#64748b; grid-column: 1/-1; text-align:center;'>전시된 작품이 없습니다.</div>";
+                return;
+            }
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const docId = doc.id;
+
+                // 카드 및 캔버스 컨테이너 생성
+                const card = document.createElement('div');
+                card.className = 'art-card';
+
+                const canvasBox = document.createElement('div');
+                canvasBox.className = 'art-canvas-box';
+
+                const infoBox = document.createElement('div');
+                infoBox.className = 'art-info';
+                infoBox.innerHTML = `
+                    <span class="art-title">${data.author || '무명'}</span>
+                    <button class="delete-btn" onclick="deleteArtwork('${docId}', '${data.password || ''}')">❌ 삭제</button>
+                `;
+
+                card.appendChild(canvasBox);
+                card.appendChild(infoBox);
+                gallery.appendChild(card);
+
+                // p5 인스턴스를 해당 canvasBox DOM 노드에 직접 바인딩 (레이아웃 겹침 해결)
+                new p5((p) => {
+                    p.setup = () => {
+                        let w = canvasBox.clientWidth || 240;
+                        p.createCanvas(w, w);
+                        drawGenerativeArt(p, data.seed, data.genre, data.author);
+                        p.noLoop();
+                    };
+                }, canvasBox);
+            });
+        } catch (e) {
+            console.error(e);
+            gallery.innerHTML = "<div style='color:#ef4444; grid-column: 1/-1; text-align:center;'>작품을 불러오는 중 오류가 발생했습니다.</div>";
+        }
+    }
+
+    /* 삭제 기능 구현 */
+    async function deleteArtwork(docId, correctPw) {
+        const inputPw = prompt("작품을 삭제하시려면 등록 시 입력했던 삭제 비밀번호를 입력해주세요:");
+        if (inputPw === null) return; // 취소
+
+        if (inputPw.trim() === correctPw) {
+            try {
+                await db.collection("museum_arts").doc(docId).delete();
+                alert("🗑️ 작품이 성공적으로 삭제되었습니다.");
+                location.reload();
+            } catch (e) {
+                alert("삭제 실패: " + e.message);
+            }
+        } else {
+            alert("❌ 비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    loadMuseum();
+</script>
+</body>
+</html>
