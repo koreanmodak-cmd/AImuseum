@@ -3,54 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Museum : 박물관</title>
+    <title>AI MUSEUM : Exhibition Gallery</title>
     <!-- p5.js 및 Firebase SDK -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        :root {
+            --bg-dark: #0a0a0c;
+            --panel-bg: #121216;
+            --panel-border: #22222a;
+            --text-main: #f1f5f9;
+            --text-muted: #64748b;
+        }
+
         * { box-sizing: border-box; }
         body {
-            margin: 0; background: #0f172a; color: white;
-            font-family: 'Pretendard', sans-serif; padding: 20px;
-            min-height: 100vh;
+            margin: 0; font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-dark); color: var(--text-main);
+            padding: 24px; min-height: 100vh;
         }
+
         header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #334155; padding-bottom: 15px; margin-bottom: 30px;
-            flex-wrap: wrap; gap: 10px;
+            border-bottom: 1px solid var(--panel-border); padding-bottom: 20px; margin-bottom: 36px;
+            flex-wrap: wrap; gap: 15px;
         }
-        header h1 { margin: 0; font-size: 1.5rem; }
-        .back-link { color: #3b82f6; text-decoration: none; font-weight: bold; font-size: 0.95rem; }
-        .back-link:hover { text-decoration: underline; }
+        header h1 { margin: 0; font-size: 1.25rem; letter-spacing: 2px; font-weight: 700; text-transform: uppercase; }
+        
+        .nav-btn {
+            color: #94a3b8; text-decoration: none; font-size: 0.88rem; font-weight: 500;
+            padding: 8px 16px; border-radius: 6px; border: 1px solid var(--panel-border);
+            transition: all 0.2s ease; background: #16161e;
+        }
+        .nav-btn:hover { color: #fff; border-color: #475569; background: #1e1e28; }
+
         .gallery {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 25px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 28px;
         }
+
         .art-card {
-            background: #1e293b; border-radius: 12px; padding: 16px;
+            background: var(--panel-bg); border-radius: 8px; padding: 18px;
             display: flex; flex-direction: column; align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.4); border: 1px solid #334155;
+            border: 1px solid var(--panel-border); transition: transform 0.2s, border-color 0.2s;
         }
-        .art-title { margin-top: 12px; font-weight: bold; color: #f8fafc; font-size: 1rem; }
-        #loading { font-size: 1rem; color: #94a3b8; grid-column: 1 / -1; text-align: center; padding: 40px; }
+        .art-card:hover { transform: translateY(-4px); border-color: #334155; }
+        
+        .art-info {
+            margin-top: 14px; width: 100%; display: flex; justify-content: space-between; align-items: center;
+        }
+        .art-title { font-weight: 600; font-size: 0.95rem; color: #f8fafc; }
+        .art-sub { font-size: 0.78rem; color: var(--text-muted); font-family: monospace; }
+
+        #loading { font-size: 0.9rem; color: var(--text-muted); grid-column: 1 / -1; text-align: center; padding: 60px; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>🏛️ AI 전시장 (Museum)</h1>
-    <a href="index.html" class="back-link">← 작업실로 돌아가기</a>
+    <h1>🏛️ AI Museum Archive</h1>
+    <a href="index.html" class="nav-btn">🎨 작품 제작소로 돌아가기</a>
 </header>
 
 <div class="gallery" id="gallery">
-    <div id="loading">작품들을 불러오는 중입니다...</div>
+    <div id="loading">박물관 전시 기록을 불러오는 중입니다...</div>
 </div>
 
 <script>
-    /* =========================================
-       1. Firebase 초기화
-       ========================================= */
+    /* 1. Firebase 초기화 */
     const firebaseConfig = {
         apiKey: "AIzaSyBV08YxtJZ0y6NgXOlRG26mna-jEfsS5tk",
         authDomain: "aimuseum-8c30b.firebaseapp.com",
@@ -59,28 +82,7 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    /* =========================================
-       2. 한글 분해 함수
-       ========================================= */
-    function extractHangul(str) {
-        const chosung = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
-        const jungsung = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
-        let result = [];
-        for (let i = 0; i < str.length; i++) {
-            let code = str.charCodeAt(i) - 44032;
-            if (code > -1 && code < 11172) {
-                result.push(chosung[Math.floor(code / 588)]);
-                result.push(jungsung[Math.floor((code % 588) / 28)]);
-            } else {
-                result.push(str[i]);
-            }
-        }
-        return result.length > 0 ? result : ["A", "R", "T"];
-    }
-
-    /* =========================================
-       3. 데이터베이스 읽기 및 갤러리 렌더링
-       ========================================= */
+    /* 2. Firestore 데이터 수집 및 액자 렌더링 */
     async function loadMuseum() {
         const gallery = document.getElementById('gallery');
         try {
@@ -89,7 +91,7 @@
             if (loading) loading.remove();
 
             if (snapshot.empty) {
-                gallery.innerHTML = "<div style='color:#94a3b8; grid-column: 1/-1; text-align:center;'>아직 전시된 작품이 없습니다. 첫 작품을 전시해보세요!</div>";
+                gallery.innerHTML = "<div style='color:#64748b; grid-column: 1/-1; text-align:center;'>전시된 작품이 없습니다. 첫 작품을 창작하여 전시해보세요.</div>";
                 return;
             }
 
@@ -98,76 +100,83 @@
                 const card = document.createElement('div');
                 card.className = 'art-card';
                 card.innerHTML = `
-                    <div id="p5-art-${idx}" style="border-radius: 6px; overflow: hidden;"></div>
-                    <div class="art-title">${data.author || '무명'}의 작품</div>
+                    <div id="p5-art-${idx}" style="border-radius: 4px; overflow: hidden;"></div>
+                    <div class="art-info">
+                        <span class="art-title">${data.author || '무명'}</span>
+                        <span class="art-sub">#${(data.seed || 0).toString(16).toUpperCase().slice(-5)}</span>
+                    </div>
                 `;
                 gallery.appendChild(card);
 
+                /* p5.js 인스턴스 렌더링 */
                 new p5((p) => {
                     p.setup = () => {
-                        let canvas = p.createCanvas(230, 230);
+                        let canvas = p.createCanvas(244, 244);
                         p.randomSeed(data.seed);
                         p.noiseSeed(data.seed);
                         
-                        p.background(15, 23, 42);
+                        p.background(10, 10, 12);
                         let colors = [
-                            p.color(p.random(180, 255), p.random(50, 120), p.random(80, 150)),
-                            p.color(p.random(50, 120), p.random(180, 255), p.random(180, 255)),
-                            p.color(p.random(230, 255), p.random(180, 240), p.random(50, 100))
+                            p.color(p.random(200, 255), p.random(40, 90), p.random(60, 110)),
+                            p.color(p.random(40, 110), p.random(180, 240), p.random(200, 255)),
+                            p.color(p.random(240, 255), p.random(190, 230), p.random(60, 110)),
+                            p.color(240, 240, 245)
                         ];
 
                         if (data.genre === 0) {
                             p.noStroke();
-                            for (let i = 0; i < 15; i++) {
+                            for (let i = 0; i < 10; i++) {
                                 p.fill(p.random(colors));
-                                p.rect(p.random(p.width), p.random(p.height), p.random(20, 100), p.random(20, 100));
+                                p.rect(p.random(p.width * 0.1, p.width * 0.7), p.random(p.height * 0.1, p.height * 0.7), p.random(30, 120), p.random(30, 120));
                             }
                         } else if (data.genre === 1) {
-                            p.noFill(); p.strokeWeight(1.5);
+                            p.noFill(); p.strokeWeight(1.2);
                             for (let i = 0; i < 200; i++) {
                                 p.stroke(p.random(colors));
                                 p.beginShape();
                                 let x = p.random(p.width), y = p.random(p.height);
-                                for (let j = 0; j < 15; j++) {
+                                for (let j = 0; j < 14; j++) {
                                     p.vertex(x, y);
-                                    let angle = p.noise(x * 0.008, y * 0.008) * p.TWO_PI * 4;
-                                    x += p.cos(angle) * 8; y += p.sin(angle) * 8;
+                                    let angle = p.noise(x * 0.006, y * 0.006) * p.TWO_PI * 4;
+                                    x += p.cos(angle) * 7; y += p.sin(angle) * 7;
                                 }
                                 p.endShape();
                             }
                         } else if (data.genre === 2) {
-                            p.strokeWeight(p.random(1, 3));
+                            p.strokeWeight(p.random(1, 2.5));
                             for (let i = 0; i < 100; i++) {
                                 p.stroke(p.random(colors));
                                 p.line(p.random(p.width), p.random(p.height), p.random(p.width), p.random(p.height));
                             }
                         } else {
                             p.noStroke();
-                            for (let i = 0; i < 12; i++) {
+                            for (let i = 0; i < 10; i++) {
                                 let c = p.random(colors);
-                                p.fill(p.red(c), p.green(c), p.blue(c), p.random(70, 140));
-                                p.circle(p.random(p.width), p.random(p.height), p.random(80, 250));
+                                p.fill(p.red(c), p.green(c), p.blue(c), p.random(60, 120));
+                                p.circle(p.random(p.width), p.random(p.height), p.random(60, 200));
                             }
                         }
 
-                        let letters = extractHangul(data.author || '무명');
-                        p.textAlign(p.CENTER, p.CENTER);
-                        for (let l of letters) {
-                            p.push();
-                            p.translate(p.random(p.width), p.random(p.height));
-                            p.rotate(p.random(p.TWO_PI));
-                            p.fill(255, 255, 255, p.random(80, 180));
-                            p.textSize(p.random(20, 70));
-                            p.text(l, 0, 0);
-                            p.pop();
-                        }
+                        // ★ 우측 하단 서명 배치 ★
+                        p.push();
+                        let tagText = `${(data.author || '무명').toUpperCase()} | #${(data.seed || 0).toString(16).toUpperCase().slice(-5)}`;
+                        p.textAlign(p.RIGHT, p.BOTTOM);
+                        p.textFont('monospace');
+                        p.textSize(8.5);
+                        p.noStroke();
+                        p.fill(10, 10, 12, 180);
+                        p.rect(p.width - 200, p.height - 30, 190, 22, 3);
+                        p.fill(226, 232, 240, 210);
+                        p.text(tagText, p.width - 15, p.height - 15);
+                        p.pop();
+
                         p.noLoop();
                     };
                 }, `p5-art-${idx}`);
             });
         } catch (e) {
             console.error(e);
-            gallery.innerHTML = "<div style='color:#ef4444; grid-column: 1/-1;'>작품을 불러오는 중 오류가 발생했습니다. (Firebase 보안 규칙을 확인하세요)</div>";
+            gallery.innerHTML = "<div style='color:#ef4444; grid-column: 1/-1;'>박물관 로딩 실패: Firebase 보안 규칙을 확인하세요.</div>";
         }
     }
 
