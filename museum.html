@@ -12,9 +12,9 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         :root {
-            --bg-dark: #0a0a0c;
-            --panel-bg: #121216;
-            --panel-border: #22222a;
+            --bg-dark: #08080a;
+            --panel-bg: #111116;
+            --panel-border: #22222e;
             --text-main: #f1f5f9;
             --text-muted: #64748b;
         }
@@ -52,11 +52,23 @@
         }
         .art-card:hover { transform: translateY(-4px); border-color: #334155; }
         
+        .canvas-mount {
+            width: 240px; height: 240px; border-radius: 4px; overflow: hidden;
+            background: #000; display: flex; align-items: center; justify-content: center;
+        }
+
         .art-info {
             margin-top: 14px; width: 100%; display: flex; justify-content: space-between; align-items: center;
         }
         .art-title { font-weight: 600; font-size: 0.95rem; color: #f8fafc; }
         .art-sub { font-size: 0.78rem; color: var(--text-muted); font-family: monospace; }
+        
+        .btn-delete {
+            margin-top: 12px; width: 100%; padding: 8px; border-radius: 5px;
+            border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.08);
+            color: #ef4444; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: 0.2s;
+        }
+        .btn-delete:hover { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
 
         #loading { font-size: 0.9rem; color: var(--text-muted); grid-column: 1 / -1; text-align: center; padding: 60px; }
     </style>
@@ -65,11 +77,11 @@
 
 <header>
     <h1>🏛️ AI Museum Archive</h1>
-    <a href="index.html" class="nav-btn">🎨 작품 제작소로 돌아가기</a>
+    <a href="index.html" class="nav-btn">🎨 작품 창작소로 돌아가기</a>
 </header>
 
 <div class="gallery" id="gallery">
-    <div id="loading">박물관 전시 기록을 불러오는 중입니다...</div>
+    <div id="loading">박물관 전시 아카이브를 불러오는 중입니다...</div>
 </div>
 
 <script>
@@ -82,105 +94,43 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    /* 2. Firestore 데이터 수집 및 액자 렌더링 */
-    async function loadMuseum() {
-        const gallery = document.getElementById('gallery');
-        try {
-            const snapshot = await db.collection("museum_arts").orderBy("createdAt", "desc").limit(24).get();
-            const loading = document.getElementById('loading');
-            if (loading) loading.remove();
-
-            if (snapshot.empty) {
-                gallery.innerHTML = "<div style='color:#64748b; grid-column: 1/-1; text-align:center;'>전시된 작품이 없습니다. 첫 작품을 창작하여 전시해보세요.</div>";
-                return;
+    /* 2. 공통 정밀 예술 드로잉 함수 (index.html과 100% 동일 수식) */
+    function drawGenerativeArt(p, seed, genre, author, w, h) {
+        p.randomSeed(seed);
+        p.noiseSeed(seed);
+        
+        const palettes = [
+            ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6'],
+            ['#00f5d4', '#7b2cbf', '#f72585', '#4cc9f0', '#ffffff'],
+            ['#d4af37', '#1a1a1a', '#f5f5f7', '#8a795d', '#ffffff'],
+            ['#2a9d8f', '#e76f51', '#f4a261', '#e9c46a', '#264653'],
+            ['#00e676', '#00b0ff', '#651fff', '#f50057', '#ffffff'],
+            ['#ffffff', '#888888', '#444444', '#222222', '#ff3366']
+        ];
+        
+        let pal = palettes[Math.floor(p.random(palettes.length))];
+        p.background(8, 8, 10);
+        
+        let g = genre % 6;
+        if (g === 0) {
+            p.push();
+            p.translate(w / 2, h / 2);
+            let numPoints = p.floor(p.random(120, 280));
+            let radius = Math.min(w, h) * 0.38;
+            for (let i = 0; i < numPoints; i++) {
+                let angle = p.map(i, 0, numPoints, 0, p.TWO_PI * 5);
+                let r = p.map(i, 0, numPoints, 10, radius);
+                let x = r * p.cos(angle);
+                let y = r * p.sin(angle);
+                p.stroke(p.color(pal[i % pal.length]));
+                p.strokeWeight(p.random(1, 2.2));
+                p.noFill();
+                p.ellipse(x, y, p.random(10, 50));
+                if (i % 4 === 0) p.line(0, 0, x, y);
             }
-
-            snapshot.forEach((doc, idx) => {
-                const data = doc.data();
-                const card = document.createElement('div');
-                card.className = 'art-card';
-                card.innerHTML = `
-                    <div id="p5-art-${idx}" style="border-radius: 4px; overflow: hidden;"></div>
-                    <div class="art-info">
-                        <span class="art-title">${data.author || '무명'}</span>
-                        <span class="art-sub">#${(data.seed || 0).toString(16).toUpperCase().slice(-5)}</span>
-                    </div>
-                `;
-                gallery.appendChild(card);
-
-                /* p5.js 인스턴스 렌더링 */
-                new p5((p) => {
-                    p.setup = () => {
-                        let canvas = p.createCanvas(244, 244);
-                        p.randomSeed(data.seed);
-                        p.noiseSeed(data.seed);
-                        
-                        p.background(10, 10, 12);
-                        let colors = [
-                            p.color(p.random(200, 255), p.random(40, 90), p.random(60, 110)),
-                            p.color(p.random(40, 110), p.random(180, 240), p.random(200, 255)),
-                            p.color(p.random(240, 255), p.random(190, 230), p.random(60, 110)),
-                            p.color(240, 240, 245)
-                        ];
-
-                        if (data.genre === 0) {
-                            p.noStroke();
-                            for (let i = 0; i < 10; i++) {
-                                p.fill(p.random(colors));
-                                p.rect(p.random(p.width * 0.1, p.width * 0.7), p.random(p.height * 0.1, p.height * 0.7), p.random(30, 120), p.random(30, 120));
-                            }
-                        } else if (data.genre === 1) {
-                            p.noFill(); p.strokeWeight(1.2);
-                            for (let i = 0; i < 200; i++) {
-                                p.stroke(p.random(colors));
-                                p.beginShape();
-                                let x = p.random(p.width), y = p.random(p.height);
-                                for (let j = 0; j < 14; j++) {
-                                    p.vertex(x, y);
-                                    let angle = p.noise(x * 0.006, y * 0.006) * p.TWO_PI * 4;
-                                    x += p.cos(angle) * 7; y += p.sin(angle) * 7;
-                                }
-                                p.endShape();
-                            }
-                        } else if (data.genre === 2) {
-                            p.strokeWeight(p.random(1, 2.5));
-                            for (let i = 0; i < 100; i++) {
-                                p.stroke(p.random(colors));
-                                p.line(p.random(p.width), p.random(p.height), p.random(p.width), p.random(p.height));
-                            }
-                        } else {
-                            p.noStroke();
-                            for (let i = 0; i < 10; i++) {
-                                let c = p.random(colors);
-                                p.fill(p.red(c), p.green(c), p.blue(c), p.random(60, 120));
-                                p.circle(p.random(p.width), p.random(p.height), p.random(60, 200));
-                            }
-                        }
-
-                        // ★ 우측 하단 서명 배치 ★
-                        p.push();
-                        let tagText = `${(data.author || '무명').toUpperCase()} | #${(data.seed || 0).toString(16).toUpperCase().slice(-5)}`;
-                        p.textAlign(p.RIGHT, p.BOTTOM);
-                        p.textFont('monospace');
-                        p.textSize(8.5);
-                        p.noStroke();
-                        p.fill(10, 10, 12, 180);
-                        p.rect(p.width - 200, p.height - 30, 190, 22, 3);
-                        p.fill(226, 232, 240, 210);
-                        p.text(tagText, p.width - 15, p.height - 15);
-                        p.pop();
-
-                        p.noLoop();
-                    };
-                }, `p5-art-${idx}`);
-            });
-        } catch (e) {
-            console.error(e);
-            gallery.innerHTML = "<div style='color:#ef4444; grid-column: 1/-1;'>박물관 로딩 실패: Firebase 보안 규칙을 확인하세요.</div>";
-        }
-    }
-
-    loadMuseum();
-</script>
-</body>
-</html>
+            p.pop();
+        } else if (g === 1) {
+            p.noFill();
+            p.strokeWeight(p.random(1, 2));
+            for (let i = 0; i < 380; i++) {
+                p.stroke(
